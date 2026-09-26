@@ -87,11 +87,9 @@ def universalaction(o):
 
 
 def fileaction(o):
+    # keys as in alfredapp/heic-to-jpeg-workflow and tinypng-workflow (no accepts* flags)
     return ("alfred.workflow.trigger.action", 1, {
-        "acceptsfiles": True,
         "acceptsmulti": o.get("multi", 0),
-        "acceptstext": False,
-        "acceptsurls": False,
         "filetypes": o.get("filetypes", []),
         "name": o["name"],
     })
@@ -100,7 +98,7 @@ def fileaction(o):
 def hotkey(o):
     return ("alfred.workflow.trigger.hotkey", 2, {
         "action": 0, "argument": o.get("argument", 0), "focusedappvariable": False,
-        "focusedappvariablename": "", "hotkey": 0, "hotmod": 0, "leftcursor": False,
+        "focusedappvariablename": "", "hotkey": 0, "hotmod": 0, "hotstring": "", "leftcursor": False,
         "modsmode": 0, "relatedAppsMode": 0,
     })
 

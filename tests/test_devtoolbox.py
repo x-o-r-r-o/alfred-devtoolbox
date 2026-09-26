@@ -600,5 +600,37 @@ class FeatureTests(unittest.TestCase):
         self.assertEqual(it[-1]["title"], "17 characters · 3 words · 2 lines · 25 bytes UTF-8")
 
 
+class SecondPassTests(unittest.TestCase):
+    def test_regex_double_backslash_is_one_backslash(self):
+        self.assertEqual(sf("regex", r"/,/ => \\", clipboard="a,b")[0]["arg"], "a\\b")
+
+    def test_hash_text_ignores_clipboard_checksum(self):
+        it = sf("hash", "abc", clipboard="d41d8cd98f00b204e9800998ecf8427e")
+        self.assertTrue(it[0]["title"].startswith("MD5"))
+
+    def test_smart_md5_is_not_a_uuid(self):
+        it = sf("smart", clipboard="d41d8cd98f00b204e9800998ecf8427e")
+        self.assertFalse(any(i["title"].startswith("UUID version") for i in it))
+        self.assertTrue(sf("uuid", "d41d8cd98f00b204e9800998ecf8427e")[0]["title"].startswith("UUID version"))
+
+    def test_json_error_line_counts_leading_blank_lines(self):
+        it = sf("json", clipboard='\n\n{"a": 1,,}')
+        self.assertIn("line 3", it[0]["subtitle"])
+
+    def test_relaxed_json_escaped_quote_and_tab(self):
+        it = sf("json", clipboard="{a: \"it\\'s\", b: 'x\ty'}")
+        self.assertEqual(json.loads(find(it, "Minify")["arg"]), {"a": "it's", "b": "x\ty"})
+
+    def test_big_json_is_fast(self):
+        import time
+        big = os.path.join(CACHE, "perf.json")
+        write(big, json.dumps([{"i": i, "big": 2**60 + i, "name": "x" * 30, "tags": ["a", "b"]} for i in range(20000)]))
+        e = dict(os.environ, DT_TEST_CLIPBOARD_FILE=big, alfred_workflow_cache=CACHE)
+        t = time.time()
+        out = subprocess.run(["osascript", "-l", "JavaScript", "./devtoolbox.js", "json", ""], cwd=SRC, env=e, capture_output=True, text=True)
+        self.assertLess(time.time() - t, 3)
+        self.assertTrue(json.loads(out.stdout)["items"][0]["title"].startswith("Valid JSON · 20000 items"))
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=1)

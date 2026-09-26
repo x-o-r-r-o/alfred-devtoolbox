@@ -129,11 +129,12 @@ function hexOf(bytes) {
   return bytes.map((b) => b.toString(16).padStart(2, "0")).join("");
 }
 
+const HEX = Array.from({ length: 256 }, (_, i) => i.toString(16).padStart(2, "0"));
 function dataHex(data) {
   const bin = $.NSString.alloc.initWithDataEncoding(data, $.NSISOLatin1StringEncoding).js;
-  let h = "";
-  for (let i = 0; i < bin.length; i++) h += bin.charCodeAt(i).toString(16).padStart(2, "0");
-  return h;
+  const out = new Array(bin.length);
+  for (let i = 0; i < bin.length; i++) out[i] = HEX[bin.charCodeAt(i)];
+  return out.join("");
 }
 
 // Run a command with stdin, return stdout (trimmed) or null on failure
@@ -313,10 +314,10 @@ function relaxedJSON(text) {
       let j = i + 1, buf = "";
       while (j < n && s[j] !== c) {
         if (s[j] === "\\" && j + 1 < n) {
-          buf += c === "'" && s[j + 1] === "'" ? "'" : s[j] + s[j + 1];
+          buf += s[j + 1] === "'" ? "'" : s[j] + s[j + 1]; // \' is valid JS but not JSON
           j += 2;
         } else {
-          buf += c === "'" && s[j] === '"' ? '\\"' : s[j];
+          buf += c === "'" && s[j] === '"' ? '\\"' : s[j] < " " ? JSON.stringify(s[j]).slice(1, -1) : s[j];
           j++;
         }
       }
@@ -489,9 +490,9 @@ function jsonItems(query) {
       row("CSV → JSON", JSON.stringify(csv, null, INDENT), "Array of objects, one per row", "json", { match: "csv convert" }),
       row("CSV → JSON Lines", csv.map((o) => JSON.stringify(o)).join("\n"), "One object per line", "json", { match: "csv jsonl lines" }),
     ];
-    const where = src.text.length <= MAX_TEXT ? jsonError(src.text.trim()) : null;
+    const where = src.text.length <= MAX_TEXT ? jsonError(src.text) : null;
     return [
-      info("Invalid JSON", `${where ? describeError(src.text.trim(), where) : p.error} (${src.source})`, "error"),
+      info("Invalid JSON", `${where ? describeError(src.text, where) : p.error} (${src.source})`, "error"),
       row("Escape as JSON string", JSON.stringify(src.text), "Wrap the text in a JSON string literal · ↩ Copy · ⌘↩ Paste", "json"),
     ];
   }
@@ -626,9 +627,10 @@ function dateRows(ms, label) {
 }
 
 // Inspect an existing UUID or ULID: version, variant, embedded time, other spellings
-function decodeIdItems(text) {
+function decodeIdItems(text, strict = false) {
   const t = text.trim();
-  const u = t.match(UUID_RE);
+  // strict (smart hub): a bare 32-hex string is more likely an MD5 than a UUID
+  const u = strict && (t.match(/-/g) || []).length !== 4 ? null : t.match(UUID_RE);
   if (u) {
     const hex = u.slice(1).join("").toLowerCase();
     const dashed = `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
@@ -752,7 +754,7 @@ function jwtItems(query) {
   const typed = query.trim();
   const cq = cleanToken(typed);
   const first = cq.split(/\s+/)[0] || "";
-  let q, secret = "", source = "query";
+  let q, secret = "";
   if (JWT_RE.test(first)) {
     q = first;
     secret = cq.slice(first.length).trim();
@@ -761,7 +763,6 @@ function jwtItems(query) {
     if (JWT_RE.test(clip)) {
       q = clip;
       secret = typed;
-      source = "clipboard";
     } else if (typed) return [info("Not a JWT", "Expected header.payload.signature (query)", "error")];
     else if (!clip) return [emptyClip("Copy a JWT, or paste it after the keyword", "jwt")];
     else return [info("Not a JWT", "Expected header.payload.signature (clipboard)", "error")];
@@ -825,7 +826,7 @@ function parseRegex(q) {
   const arrow = q.lastIndexOf(" => ");
   if (arrow >= 0) {
     // \n and \t in the replacement insert a line break or tab (they can't be typed in Alfred)
-    replacement = q.slice(arrow + 4).replace(/\\([nt\\])/g, (_, c) => (c === "n" ? "\n" : c === "t" ? "\t" : "\\\\"));
+    replacement = q.slice(arrow + 4).replace(/\\([nt\\])/g, (_, c) => (c === "n" ? "\n" : c === "t" ? "\t" : "\\"));
     q = q.slice(0, arrow);
   }
   let pattern = q, flags = "g";
@@ -960,7 +961,7 @@ function clipboardChecksum() {
 }
 
 function hashItems(query) {
-  let data, label;
+  let data, label, isFile = false;
   const path = typeof query === "string" ? query.trim().replace(/^~(?=\/)/, $.NSHomeDirectory().js) : "";
   const fm = $.NSFileManager.defaultManager, isDir = Ref();
   if (path.startsWith("/") && fm.fileExistsAtPathIsDirectory(path, isDir)) {
@@ -971,6 +972,7 @@ function hashItems(query) {
     data = $.NSData.dataWithContentsOfFileOptionsError(path, 1, $());
     if (data.isNil()) return [info("Can't read that file", path, "error")];
     label = `${path.split("/").pop()} (${plural(Number(data.length), "byte")})`;
+    isFile = true;
   } else {
     const src = inputOrClipboard(query);
     if (!src.text) return [emptyClip("Type text after the keyword, or copy some", "hash")];
@@ -978,7 +980,7 @@ function hashItems(query) {
     label = `${src.source} (${plural(Number(data.length), "byte")})`;
   }
   // Compare with a checksum in the clipboard, e.g. copied from a download page
-  const expected = path ? clipboardChecksum() : "";
+  const expected = isFile ? clipboardChecksum() : "";
   const up = (h) => (HASH_UPPER ? h.toUpperCase() : h);
   const items = [];
   let matched = false;
@@ -1066,7 +1068,7 @@ function encItems(query) {
   items.push(row(`Hex: ${oneLine(hex, 80)}`, hex, "UTF-8 bytes as hex", "enc"));
   const esc = JSON.stringify(t).slice(1, -1);
   if (esc !== t) items.push(row(`Backslash escape: ${oneLine(esc, 80)}`, esc, "Escape quotes, backslashes and control characters", "enc"));
-  const uni = [...t].map((c) => { const cp = c.codePointAt(0); return cp < 128 ? c : cp > 0xffff ? `\\u{${cp.toString(16)}}` : `\\u${cp.toString(16).padStart(4, "0")}`; }).join("");
+  const uni = t.replace(/[^\x00-\x7f]/gu, (c) => { const cp = c.codePointAt(0); return cp > 0xffff ? `\\u{${cp.toString(16)}}` : `\\u${cp.toString(16).padStart(4, "0")}`; });
   if (uni !== t) items.push(row(`Unicode escape: ${oneLine(uni, 80)}`, uni, "Non-ASCII as \\uXXXX", "enc"));
   return items;
 }
@@ -1295,7 +1297,7 @@ function smartItems(query) {
   if (JWT_RE.test(bare) && bare.startsWith("eyJ")) items.push(...jwtItems(t));
   else if (/^[\[{]/.test(t) && (parseJSON(t).ok || relaxedJSON(t) !== null)) items.push(...jsonItems(src));
   else if (t.includes("\n") && csvToJSON(t)) items.push(...jsonItems(src));
-  else if ((ids = decodeIdItems(t))) items.push(...ids);
+  else if ((ids = decodeIdItems(t, true))) items.push(...ids);
   else if (/^-?\d{9,19}(\.\d+)?$/.test(t) || (/^\d{4}-\d{2}-\d{2}/.test(t) && !isNaN(Date.parse(t)))) items.push(...epochItems(t));
   if (!ids && t.length <= 200 && !t.includes("\n")) items.push(...caseItems(src).filter((it) => it.valid !== false).slice(0, 5));
   items.push(...encItems(src));
