@@ -652,7 +652,8 @@ class FinalReviewTests(unittest.TestCase):
         self.assertTrue(any(t["title"].startswith("Can't verify") for t in it))
 
     def test_jwt_payload_keeps_big_numbers(self):
-        tok = f"{b64url({'alg': 'HS256'})}.{b64url(b'{\"id\":12345678901234567890}')}.x"
+        payload = b'{"id":12345678901234567890}'
+        tok = f"{b64url({'alg': 'HS256'})}.{b64url(payload)}.x"
         it = sf("jwt", tok)
         self.assertIn("12345678901234567890", find(it, "Payload")["arg"])
         self.assertEqual(find(it, "id:")["arg"], "12345678901234567890")
