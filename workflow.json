@@ -262,7 +262,7 @@
       "keyword": "{var:keyword_diff}",
       "title": "Diff",
       "subtext": "Compare the last two clipboard entries",
-      "script": "osascript -l JavaScript ./devtoolbox.js diff \"$1\""
+      "script": "osascript -l JavaScript ./devtoolbox.js diff \"$@\""
     },
     {
       "id": "sf_case",
@@ -283,7 +283,7 @@
       "type": "universalaction",
       "name": "Diff with DevToolbox",
       "files": true,
-      "multi": 1
+      "multi": 2
     },
     {
       "id": "ua_hash",

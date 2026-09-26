@@ -345,7 +345,7 @@
 				<key>alfredfiltersresultsmatchmode</key>
 				<integer>0</integer>
 				<key>argumenttreatemptyqueryasnil</key>
-				<false/>
+				<true/>
 				<key>argumenttrimmode</key>
 				<integer>0</integer>
 				<key>argumenttype</key>
@@ -396,7 +396,7 @@
 				<key>alfredfiltersresultsmatchmode</key>
 				<integer>0</integer>
 				<key>argumenttreatemptyqueryasnil</key>
-				<false/>
+				<true/>
 				<key>argumenttrimmode</key>
 				<integer>0</integer>
 				<key>argumenttype</key>
@@ -447,7 +447,7 @@
 				<key>alfredfiltersresultsmatchmode</key>
 				<integer>0</integer>
 				<key>argumenttreatemptyqueryasnil</key>
-				<false/>
+				<true/>
 				<key>argumenttrimmode</key>
 				<integer>0</integer>
 				<key>argumenttype</key>
@@ -498,7 +498,7 @@
 				<key>alfredfiltersresultsmatchmode</key>
 				<integer>0</integer>
 				<key>argumenttreatemptyqueryasnil</key>
-				<false/>
+				<true/>
 				<key>argumenttrimmode</key>
 				<integer>0</integer>
 				<key>argumenttype</key>
@@ -549,7 +549,7 @@
 				<key>alfredfiltersresultsmatchmode</key>
 				<integer>0</integer>
 				<key>argumenttreatemptyqueryasnil</key>
-				<false/>
+				<true/>
 				<key>argumenttrimmode</key>
 				<integer>0</integer>
 				<key>argumenttype</key>
@@ -600,7 +600,7 @@
 				<key>alfredfiltersresultsmatchmode</key>
 				<integer>0</integer>
 				<key>argumenttreatemptyqueryasnil</key>
-				<false/>
+				<true/>
 				<key>argumenttrimmode</key>
 				<integer>0</integer>
 				<key>argumenttype</key>
@@ -651,7 +651,7 @@
 				<key>alfredfiltersresultsmatchmode</key>
 				<integer>0</integer>
 				<key>argumenttreatemptyqueryasnil</key>
-				<false/>
+				<true/>
 				<key>argumenttrimmode</key>
 				<integer>0</integer>
 				<key>argumenttype</key>
@@ -702,7 +702,7 @@
 				<key>alfredfiltersresultsmatchmode</key>
 				<integer>0</integer>
 				<key>argumenttreatemptyqueryasnil</key>
-				<false/>
+				<true/>
 				<key>argumenttrimmode</key>
 				<integer>0</integer>
 				<key>argumenttype</key>
@@ -753,7 +753,7 @@
 				<key>alfredfiltersresultsmatchmode</key>
 				<integer>0</integer>
 				<key>argumenttreatemptyqueryasnil</key>
-				<false/>
+				<true/>
 				<key>argumenttrimmode</key>
 				<integer>0</integer>
 				<key>argumenttype</key>
@@ -773,7 +773,7 @@
 				<key>runningsubtext</key>
 				<string>…</string>
 				<key>script</key>
-				<string>osascript -l JavaScript ./devtoolbox.js diff "$1"</string>
+				<string>osascript -l JavaScript ./devtoolbox.js diff "$@"</string>
 				<key>scriptargtype</key>
 				<integer>1</integer>
 				<key>scriptfile</key>
@@ -804,7 +804,7 @@
 				<key>alfredfiltersresultsmatchmode</key>
 				<integer>0</integer>
 				<key>argumenttreatemptyqueryasnil</key>
-				<false/>
+				<true/>
 				<key>argumenttrimmode</key>
 				<integer>0</integer>
 				<key>argumenttype</key>
@@ -874,7 +874,7 @@
 				<key>acceptsfiles</key>
 				<true/>
 				<key>acceptsmulti</key>
-				<integer>1</integer>
+				<integer>2</integer>
 				<key>acceptstext</key>
 				<false/>
 				<key>acceptsurls</key>
@@ -1055,25 +1055,23 @@ The same keys work in every tool below.
 
 ### JSON
 
-Pretty print, minify, sort keys, generate TypeScript interfaces, or convert to JSON Lines or CSV via the `json` keyword. It also fixes JavaScript-style objects (unquoted keys, single quotes, trailing commas) and converts CSV to JSON. Type `min`, `sort` or `ts` to jump to an action, or paste JSON after the keyword.
+Pretty print, minify, sort keys, generate TypeScript interfaces, or convert to JSON Lines or CSV via the `json` keyword. It also fixes JavaScript-style objects (unquoted keys, single quotes, comments, trailing commas), converts CSV to JSON, points to the line and column of a syntax error, and warns about duplicate keys. Large integers and numbers like `1.0` are kept exactly as written. Type `min`, `sort` or `ts` to jump to an action, or paste JSON after the keyword.
 
 ### IDs
 
-Generate a UUID v4, UUID v7, ULID or Nano ID via the `uuid` keyword. Start with a number to generate several, one per line, like `uuid 10 v7`.
+Generate a UUID v4, UUID v7, ULID or Nano ID via the `uuid` keyword. Start with a number to generate several, one per line, like `uuid 10 v7`. Paste a UUID or ULID after the keyword to see its version and creation time.
 
 ### JWT
 
-Decode a JSON Web Token from the clipboard via the `jwt` keyword: see whether it has expired, its header, payload and every claim, with dates in local time. The signature is not verified.
+Decode a JSON Web Token from the clipboard via the `jwt` keyword: see whether it has expired, its header, payload and every claim, with dates in local time. Type the secret after the keyword to verify an HS256, HS384 or HS512 signature.
 
 ### Regular Expressions
 
-Test a regular expression against the clipboard via the `regex` keyword. Write `/pattern/flags` to set flags, and add ` =&gt; replacement` to replace matches (`$1` and `$&lt;name&gt;` refer to groups).
-
-* &lt;kbd&gt;↩&lt;/kbd&gt; on the summary row copies every match, one per line.
+Test a regular expression against the clipboard via the `regex` keyword. Write `/pattern/flags` to set flags, and add ` =&gt; replacement` to replace matches (`$1` and `$&lt;name&gt;` refer to groups, `\n` and `\t` insert a line break or tab). Press &lt;kbd&gt;↩&lt;/kbd&gt; on the summary row to copy every match, one per line.
 
 ### Case
 
-Convert text to camelCase, PascalCase, snake_case, CONSTANT_CASE, kebab-case, Title Case, Sentence case and more via the `case` keyword.
+Convert text to camelCase, PascalCase, snake_case, CONSTANT_CASE, kebab-case, Title Case, Sentence case and more via the `case` keyword. The last row counts characters, words, lines and bytes.
 
 ### Hashes
 
@@ -1091,7 +1089,7 @@ Convert Unix timestamps (seconds, milliseconds, microseconds or nanoseconds) and
 
 ### Diff
 
-Compare the last two text entries of Alfred’s Clipboard History via the `diff` keyword. JSON is compared with its keys sorted, so only real changes show.
+Compare the last two text entries of Alfred’s Clipboard History (turn it on in Alfred’s Features) via the `diff` keyword. JSON is compared with its keys sorted, so only real changes show.
 
 Alternatively, compare two selected files via the Universal Action.
 
