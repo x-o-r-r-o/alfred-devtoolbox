@@ -63,7 +63,7 @@ function row(title, value, subtitle, icon, extra = {}) {
       valid: v !== "",
       text,
       icon: { path: `icons/${icon}.png` },
-      mods: { cmd: { valid: v !== "", subtitle: "Paste into the frontmost app" } },
+      mods: { cmd: { arg: v, valid: v !== "", subtitle: "Paste into the frontmost app" } },
     },
     extra
   );
