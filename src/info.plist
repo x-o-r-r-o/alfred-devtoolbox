@@ -3,24 +3,224 @@
 <plist version="1.0">
 <dict>
 	<key>bundleid</key>
-	<string>com.xorro.devtoolbox</string>
-	<key>name</key>
-	<string>DevToolbox</string>
-	<key>description</key>
-	<string>One workflow for everyday developer transforms: JSON, UUID, JWT, regex, hashes, encoding, timestamps, diff.</string>
-	<key>createdby</key>
-	<string>xorro</string>
-	<key>version</key>
-	<string>0.1.0</string>
-	<key>readme</key>
-	<string>See README.md</string>
-	<key>objects</key>
-	<array/>
+	<string>io.github.x-o-r-r-o.devtoolbox</string>
+	<key>category</key>
+	<string>Productivity</string>
 	<key>connections</key>
 	<dict/>
+	<key>createdby</key>
+	<string>x-o-r-r-o</string>
+	<key>description</key>
+	<string>One workflow for everyday developer transforms: JSON, UUID, JWT, regex, hashes, encoding, timestamps, diff.</string>
+	<key>name</key>
+	<string>DevToolbox</string>
+	<key>objects</key>
+	<array/>
+	<key>readme</key>
+	<string># DevToolbox
+
+One workflow for everyday developer transforms: JSON, UUID, JWT, regex, hashes, encoding, timestamps, diff.
+
+&gt; **Status:** planned — not yet functional. See [PLAN.md](PLAN.md).
+
+## Usage
+
+One workflow for everyday developer transforms: JSON, UUID, JWT, regex, hashes, encoding, timestamps, diff via the `json` keyword.
+
+![DevToolbox results in Alfred](images/json.png)
+
+* &lt;kbd&gt;↩&lt;/kbd&gt; Primary action.
+* &lt;kbd&gt;⌘&lt;/kbd&gt;&lt;kbd&gt;↩&lt;/kbd&gt; Secondary action.
+* &lt;kbd&gt;⌘&lt;/kbd&gt;&lt;kbd&gt;Y&lt;/kbd&gt; Quick Look.
+
+Every keyword can be changed in the Workflow’s Configuration.
+
+## Development
+
+```bash
+./build.sh   # -&gt; dist/alfred-devtoolbox-&lt;version&gt;.alfredworkflow
+```
+
+## AI disclosure
+
+This workflow is developed with the help of Claude (Anthropic), an AI assistant. All code is reviewed and tested by the author.
+</string>
 	<key>uidata</key>
 	<dict/>
 	<key>userconfigurationconfig</key>
-	<array/>
+	<array>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>default</key>
+				<string>json</string>
+				<key>placeholder</key>
+				<string>json</string>
+				<key>required</key>
+				<true/>
+				<key>trim</key>
+				<true/>
+			</dict>
+			<key>description</key>
+			<string></string>
+			<key>label</key>
+			<string>Json keyword</string>
+			<key>type</key>
+			<string>textfield</string>
+			<key>variable</key>
+			<string>keyword_json</string>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>default</key>
+				<string>uuid</string>
+				<key>placeholder</key>
+				<string>uuid</string>
+				<key>required</key>
+				<true/>
+				<key>trim</key>
+				<true/>
+			</dict>
+			<key>description</key>
+			<string></string>
+			<key>label</key>
+			<string></string>
+			<key>type</key>
+			<string>textfield</string>
+			<key>variable</key>
+			<string>keyword_uuid</string>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>default</key>
+				<string>jwt</string>
+				<key>placeholder</key>
+				<string>jwt</string>
+				<key>required</key>
+				<true/>
+				<key>trim</key>
+				<true/>
+			</dict>
+			<key>description</key>
+			<string></string>
+			<key>label</key>
+			<string></string>
+			<key>type</key>
+			<string>textfield</string>
+			<key>variable</key>
+			<string>keyword_jwt</string>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>default</key>
+				<string>regex</string>
+				<key>placeholder</key>
+				<string>regex</string>
+				<key>required</key>
+				<true/>
+				<key>trim</key>
+				<true/>
+			</dict>
+			<key>description</key>
+			<string></string>
+			<key>label</key>
+			<string></string>
+			<key>type</key>
+			<string>textfield</string>
+			<key>variable</key>
+			<string>keyword_regex</string>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>default</key>
+				<string>hash</string>
+				<key>placeholder</key>
+				<string>hash</string>
+				<key>required</key>
+				<true/>
+				<key>trim</key>
+				<true/>
+			</dict>
+			<key>description</key>
+			<string></string>
+			<key>label</key>
+			<string></string>
+			<key>type</key>
+			<string>textfield</string>
+			<key>variable</key>
+			<string>keyword_hash</string>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>default</key>
+				<string>enc</string>
+				<key>placeholder</key>
+				<string>enc</string>
+				<key>required</key>
+				<true/>
+				<key>trim</key>
+				<true/>
+			</dict>
+			<key>description</key>
+			<string></string>
+			<key>label</key>
+			<string></string>
+			<key>type</key>
+			<string>textfield</string>
+			<key>variable</key>
+			<string>keyword_enc</string>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>default</key>
+				<string>epoch</string>
+				<key>placeholder</key>
+				<string>epoch</string>
+				<key>required</key>
+				<true/>
+				<key>trim</key>
+				<true/>
+			</dict>
+			<key>description</key>
+			<string></string>
+			<key>label</key>
+			<string></string>
+			<key>type</key>
+			<string>textfield</string>
+			<key>variable</key>
+			<string>keyword_epoch</string>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>default</key>
+				<string>diff</string>
+				<key>placeholder</key>
+				<string>diff</string>
+				<key>required</key>
+				<true/>
+				<key>trim</key>
+				<true/>
+			</dict>
+			<key>description</key>
+			<string></string>
+			<key>label</key>
+			<string></string>
+			<key>type</key>
+			<string>textfield</string>
+			<key>variable</key>
+			<string>keyword_diff</string>
+		</dict>
+	</array>
+	<key>version</key>
+	<string>0.1.0</string>
+	<key>webaddress</key>
+	<string>https://github.com/x-o-r-r-o/alfred-devtoolbox</string>
 </dict>
 </plist>
