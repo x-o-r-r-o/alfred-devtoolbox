@@ -4,11 +4,16 @@ import json, os, plistlib, re, subprocess, sys, tempfile, unittest
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SRC = os.path.join(ROOT, "src")
-CACHE = tempfile.mkdtemp(prefix="devtoolbox-test-")
+# Like Alfred's real cache folder: a path with spaces
+CACHE = os.path.join(tempfile.mkdtemp(prefix="devtoolbox-test-"), "Caches", "com.runningwithcrayons.Alfred",
+                     "Workflow Data", "io.github.x-o-r-r-o.devtoolbox")
+os.makedirs(CACHE)
+# Tests never read the real pasteboard's files or Alfred's real Clipboard History
+FAKE = dict(DT_TEST_CLIPBOARD_FILES="", DT_TEST_CLIPBOARD_DB=os.path.join(CACHE, "no-such.alfdb"))
 
 
 def sf(cmd, query="", clipboard="", **env):
-    e = dict(os.environ, DT_TEST_CLIPBOARD=clipboard, alfred_workflow_cache=CACHE, **env)
+    e = dict(os.environ, DT_TEST_CLIPBOARD=clipboard, alfred_workflow_cache=CACHE, **dict(FAKE, **env))
     out = subprocess.run(["osascript", "-l", "JavaScript", "./devtoolbox.js", cmd, query], cwd=SRC, env=e,
                          capture_output=True, text=True, timeout=30)
     assert out.returncode == 0, out.stderr
@@ -361,7 +366,7 @@ class PlistTests(unittest.TestCase):
 
 
 def run_raw(args, clipboard="", **env):
-    e = dict(os.environ, DT_TEST_CLIPBOARD=clipboard, alfred_workflow_cache=CACHE, **env)
+    e = dict(os.environ, DT_TEST_CLIPBOARD=clipboard, alfred_workflow_cache=CACHE, **dict(FAKE, **env))
     return subprocess.run(["osascript", "-l", "JavaScript", "./devtoolbox.js", *args], cwd=SRC, env=e,
                           capture_output=True, text=True, timeout=30)
 
@@ -680,6 +685,145 @@ class FinalReviewTests(unittest.TestCase):
             write(b, "2\n")
             sf("diff", f"{a}\t{b}")
         self.assertEqual(sorted(os.listdir(os.path.join(CACHE, "diff"))), ["x2.a.txt", "y2.b.txt"])
+
+
+def alfred_env(home, **extra):
+    """The environment Alfred gives a script: no LANG/LC_*, no Homebrew on PATH, Alfred's variables."""
+    bid = "io.github.x-o-r-r-o.devtoolbox"
+    e = {"HOME": home, "USER": os.environ.get("USER", "user"), "TMPDIR": os.environ.get("TMPDIR", "/tmp"),
+         "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
+         "alfred_workflow_cache": os.path.join(home, "Library/Caches/com.runningwithcrayons.Alfred/Workflow Data", bid),
+         "alfred_workflow_data": os.path.join(home, "Library/Application Support/Alfred/Workflow Data", bid),
+         "alfred_preferences": os.path.join(home, "Library/Application Support/Alfred/Alfred.alfredpreferences"),
+         "alfred_version": "5.6", "alfred_version_build": "2290", "alfred_theme_subtext": "0",
+         "alfred_workflow_bundleid": bid, "alfred_workflow_name": "DevToolbox", "alfred_workflow_version": "1.0.0",
+         "alfred_workflow_uid": "user.workflow.TEST", "alfred_debug": "1"}
+    e.update(FAKE)
+    e.update(extra)
+    return e
+
+
+class Round4Tests(unittest.TestCase):
+    """Real-runtime conditions and v1.1 improvements."""
+
+    def run_alfred(self, args, killed=False, **extra):
+        home = tempfile.mkdtemp(prefix="devtoolbox home ")
+        e = alfred_env(home, **extra)
+        out = subprocess.run(["/usr/bin/osascript", "-l", "JavaScript", "./devtoolbox.js", *args], cwd=SRC, env=e,
+                             capture_output=True, timeout=30)
+        self.assertEqual(out.returncode, -9 if killed else 0, out.stderr)  # the regex watchdog uses kill -9
+        return e, out.stdout.decode("utf-8")
+
+    def test_alfred_env_fresh_install_unicode_and_large_results(self):
+        # No LANG, cache folder with spaces that doesn't exist yet (fresh install)
+        big = os.path.join(CACHE, "r4 big.json")
+        write(big, json.dumps([{"i": i, "s": "é" * 40} for i in range(3000)], ensure_ascii=False))
+        e, out = self.run_alfred(["json", ""], DT_TEST_CLIPBOARD_FILE=big)
+        self.assertFalse(os.path.exists(e["alfred_workflow_data"]))  # nothing is written there
+        pretty = find(json.loads(out)["items"], "Pretty")["arg"]
+        self.assertTrue(pretty.startswith("dtfile:" + e["alfred_workflow_cache"] + "/result-"))
+        r = subprocess.run(["/bin/bash", "./resolve.sh", pretty], cwd=SRC, env=e, capture_output=True)
+        self.assertEqual(json.loads(r.stdout.decode("utf-8"))[2999]["s"], "é" * 40)
+        e, out = self.run_alfred(["case", "héllo wörld 👋"], DT_TEST_CLIPBOARD="")
+        self.assertIn("héllo_wörld", args(json.loads(out)["items"]))
+        e, out = self.run_alfred(["regex", "x"], killed=True, DT_TEST_CLIPBOARD="x", DT_TEST_HANG="1")
+        self.assertTrue(json.loads(out)["items"][0]["title"].startswith("⚠ Pattern too slow"))
+
+    def test_alfred_env_diff_in_fresh_cache(self):
+        d = tempfile.mkdtemp()
+        a, b = os.path.join(d, "ä 1.txt"), os.path.join(d, "b.txt")
+        write(a, "one\nzwei\n")
+        write(b, "one\ndrei\n")
+        e, out = self.run_alfred(["diff", a, b])
+        it = json.loads(out)["items"][0]
+        self.assertTrue(it["title"].startswith("+1 −1"), it)
+        self.assertTrue(it["arg"].startswith(e["alfred_workflow_cache"]))
+
+    def test_config_values_as_alfred_passes_them(self):
+        self.assertEqual(find(sf("hash", "abc", hash_uppercase="0"), "MD5")["arg"], "900150983cd24fb0d6963f7d28e17f72")
+        self.assertEqual(find(sf("json", clipboard='{"a":1}', json_indent="bogus"), "Pretty")["arg"], '{\n  "a": 1\n}')
+        menu = sf("smart", clipboard="", keyword_json="", keyword_uuid="  Ü2 ")
+        self.assertTrue(menu[0]["title"].endswith("·  json"), menu[0])
+        self.assertTrue(menu[1]["title"].endswith("·  Ü2"), menu[1])
+
+    def test_regex_empty_replacement_after_alfred_trims(self):
+        self.assertEqual(sf("regex", r"/\d+/ =>", clipboard="a1b22")[0]["arg"], "ab")
+        self.assertEqual(sf("regex", r"\d => ", clipboard="a1b2")[0]["arg"], "ab")
+        # without delimiters a trailing " =>" is part of the pattern (e.g. arrow functions)
+        self.assertTrue(sf("regex", r"\) =>", clipboard="f = (x) => x")[0]["title"].startswith("1 match"))
+
+    def test_regex_script_filter_keeps_spaces(self):
+        subprocess.run([sys.executable, "tools/build.py"], cwd=ROOT, check=True, capture_output=True)
+        with open(os.path.join(SRC, "info.plist"), "rb") as f:
+            p = plistlib.load(f)
+        modes = {o["config"]["keyword"]: o["config"]["argumenttrimmode"] for o in p["objects"] if "keyword" in o["config"]}
+        self.assertEqual(modes["{var:keyword_regex}"], 1)
+        self.assertEqual(modes["{var:keyword_json}"], 0)
+
+    def test_uuid_name_based_nil_max(self):
+        import uuid as U
+        self.assertEqual(sf("uuid", "v5 dns example.com")[0]["arg"], str(U.uuid5(U.NAMESPACE_DNS, "example.com")))
+        self.assertEqual(sf("uuid", "V3 URL https://é.com/a b")[0]["arg"], str(U.uuid3(U.NAMESPACE_URL, "https://é.com/a b")))
+        ns = "1b671a64-40d5-491e-99b0-da01ff1f3341"
+        self.assertEqual(sf("uuid", f"v5 {ns} Name")[1]["arg"], str(U.uuid5(U.UUID(ns), "Name")).upper())
+        self.assertEqual(sf("uuid", "v5")[0]["valid"], False)
+        self.assertEqual(sf("uuid", "v5 bogus x")[0]["title"], "Unknown namespace")
+        self.assertEqual(sf("uuid", "v5 dns")[0]["title"], "Type a name after the namespace")
+        self.assertEqual(sf("uuid", "nil")[0]["arg"], "00000000-0000-0000-0000-000000000000")
+        self.assertEqual(sf("uuid", "max")[0]["arg"], "ffffffff-ffff-ffff-ffff-ffffffffffff")
+        self.assertEqual(len(sf("uuid")), 6)  # nil and max only appear when asked for
+        self.assertEqual(sf("smart", "uuid v5 dns example.com")[0]["arg"], str(U.uuid5(U.NAMESPACE_DNS, "example.com")))
+
+    def test_hash_file_copied_in_finder(self):
+        import hashlib
+        f = os.path.join(CACHE, "copied file.bin")
+        write(f, b"copied")
+        it = sf("hash", clipboard="copied file.bin", DT_TEST_CLIPBOARD_FILES=f)
+        self.assertEqual(find(it, "SHA-256")["arg"], hashlib.sha256(b"copied").hexdigest())
+        self.assertIn("copied file", it[0]["subtitle"])
+        self.assertEqual(find(sf("hash", "abc", DT_TEST_CLIPBOARD_FILES=f), "MD5")["arg"], "900150983cd24fb0d6963f7d28e17f72")
+        self.assertEqual(sf("hash", DT_TEST_CLIPBOARD_FILES=f"{f}\t{f}")[0]["title"], "2 files copied")
+
+    def test_diff_files_copied_in_finder(self):
+        d = tempfile.mkdtemp()
+        a, b = os.path.join(d, "a.txt"), os.path.join(d, "b.txt")
+        write(a, "1\n")
+        write(b, "2\n")
+        self.assertTrue(sf("diff", DT_TEST_CLIPBOARD_FILES=f"{a}\t{b}")[0]["title"].startswith("+1 −1 · a.txt → b.txt"))
+
+    def test_diff_clipboard_history_database(self):
+        import sqlite3, time
+        db = os.path.join(CACHE, "clipboard.alfdb")
+        if os.path.exists(db):
+            os.remove(db)
+        c = sqlite3.connect(db, isolation_level=None)
+        c.execute("CREATE TABLE clipboard(item, ts decimal, app, apppath, dataType integer, dataHash)")
+        c.executemany("INSERT INTO clipboard VALUES (?, ?, '', '', ?, '')", [("old\n", 1, 0), ("new\n", 2, 0), ("/img.png", 3, 1)])
+        self.assertTrue(sf("diff", DT_TEST_CLIPBOARD_DB=db)[0]["title"].startswith("+1 −1 · previous → current"))
+        c.execute("BEGIN EXCLUSIVE")  # Alfred writing: wait, then say so instead of "turn it on"
+        t = time.time()
+        self.assertEqual(sf("diff", DT_TEST_CLIPBOARD_DB=db)[0]["title"], "Couldn't read Alfred's Clipboard History")
+        self.assertLess(time.time() - t, 5)
+        c.execute("ROLLBACK")
+        c.close()
+        self.assertEqual(sf("diff")[0]["title"], "Alfred's Clipboard History is not available")
+
+    def test_diff_app_found_outside_alfreds_path(self):
+        d = tempfile.mkdtemp(prefix="tools dir ")
+        log = os.path.join(d, "args.txt")
+        for tool in ("bbdiff", "code"):
+            write(os.path.join(d, tool), '#!/bin/sh\nfor a in "$@"; do printf "%s\\n" "$a"; done > "$DT_LOG"\n')
+            os.chmod(os.path.join(d, tool), 0o755)
+        common = dict(diff_action="app", diff_a="/x/a b.txt", diff_b="/x/b.txt", DT_TEST_TOOL_DIRS=d, DT_LOG=log)
+        out = run_raw(["diff-action", "/x/f.diff"], diff_app="bbedit", **common)
+        self.assertEqual(out.stdout, "")  # nothing printed: no empty notification
+        with open(log) as f:
+            self.assertEqual(f.read(), "/x/a b.txt\n/x/b.txt\n")
+        run_raw(["diff-action", "/x/f.diff"], diff_app="vscode", **common)
+        with open(log) as f:
+            self.assertEqual(f.read(), "--diff\n/x/a b.txt\n/x/b.txt\n")
+        out = run_raw(["diff-action", "/x/f.diff"], diff_app="kaleidoscope", **common)
+        self.assertEqual(out.stdout.strip(), "Kaleidoscope: its command-line tool (ksdiff) is not installed")
 
 
 if __name__ == "__main__":

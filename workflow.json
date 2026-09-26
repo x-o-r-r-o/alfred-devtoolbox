@@ -166,7 +166,7 @@
       "type": "popupbutton",
       "variable": "diff_app",
       "label": "Diff app (⌥↩)",
-      "description": "Used to compare side by side. Its command-line tool must be installed.",
+      "description": "Used to compare side by side. FileMerge needs Xcode, Kaleidoscope its ksdiff tool.",
       "config": {
         "default": "filemerge",
         "pairs": [
@@ -230,7 +230,8 @@
       "title": "Test Regex",
       "subtext": "Match a pattern against the clipboard",
       "script": "osascript -l JavaScript ./devtoolbox.js regex \"$1\"",
-      "queuedelaymode": 1
+      "queuedelaymode": 1,
+      "trimmode": 1
     },
     {
       "id": "sf_hash",

@@ -27,7 +27,7 @@ Pretty print, minify, sort keys, generate TypeScript interfaces, or convert to J
 
 ### IDs
 
-Generate a UUID v4, UUID v7, ULID or Nano ID via the `uuid` keyword. Start with a number to generate several, one per line, like `uuid 10 v7`. Paste a UUID or ULID after the keyword to see its version and creation time.
+Generate a UUID v4, UUID v7, ULID or Nano ID via the `uuid` keyword. Start with a number to generate several, one per line, like `uuid 10 v7`. Type `v5` or `v3`, a namespace (`dns`, `url`, `oid`, `x500` or a UUID) and a name for a name-based UUID, like `uuid v5 dns example.com`, or `nil` or `max` for the special UUIDs. Paste a UUID or ULID after the keyword to see its version and creation time.
 
 ![Generating IDs](images/uuid.png)
 
@@ -39,7 +39,7 @@ Decode a JSON Web Token from the clipboard via the `jwt` keyword: see whether it
 
 ### Regular Expressions
 
-Test a regular expression against the clipboard via the `regex` keyword. Write `/pattern/flags` to set flags, and add ` => replacement` to replace matches (`$1` and `$<name>` refer to groups, `\n` and `\t` insert a line break or tab). Press <kbd>↩</kbd> on the summary row to copy every match, one per line.
+Test a regular expression against the clipboard via the `regex` keyword. Write `/pattern/flags` to set flags, and add ` => replacement` to replace matches (`$1` and `$<name>` refer to groups, `\n` and `\t` insert a line break or tab). End with `/pattern/ =>` to remove the matches. Press <kbd>↩</kbd> on the summary row to copy every match, one per line.
 
 ![Testing a regular expression](images/regex.png)
 
@@ -55,7 +55,7 @@ Get the MD5, SHA-1, SHA-256, SHA-512 and CRC32 of the clipboard or typed text vi
 
 ![Hashing text](images/hash.png)
 
-Alternatively, hash a file via the Universal Action. Copy the checksum from a download page first to see whether the file matches.
+Alternatively, hash a file via the Universal Action, or copy it in Finder and use the `hash` keyword. With the Universal Action, copy the checksum from a download page first to see whether the file matches.
 
 ![Checking a file against a copied checksum](images/hash-file.png)
 
@@ -77,7 +77,7 @@ Compare the last two text entries of Alfred’s Clipboard History (turn it on in
 
 ![Comparing two clipboard entries](images/diff.png)
 
-Alternatively, compare two selected files via the Universal Action.
+Alternatively, compare two selected files via the Universal Action, or copy two files in Finder and use the `diff` keyword.
 
 ![Comparing two files with the Universal Action](images/diff-files.png)
 

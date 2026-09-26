@@ -551,7 +551,7 @@
 				<key>argumenttreatemptyqueryasnil</key>
 				<true/>
 				<key>argumenttrimmode</key>
-				<integer>0</integer>
+				<integer>1</integer>
 				<key>argumenttype</key>
 				<integer>1</integer>
 				<key>escaping</key>
@@ -1059,7 +1059,7 @@ Pretty print, minify, sort keys, generate TypeScript interfaces, or convert to J
 
 ### IDs
 
-Generate a UUID v4, UUID v7, ULID or Nano ID via the `uuid` keyword. Start with a number to generate several, one per line, like `uuid 10 v7`. Paste a UUID or ULID after the keyword to see its version and creation time.
+Generate a UUID v4, UUID v7, ULID or Nano ID via the `uuid` keyword. Start with a number to generate several, one per line, like `uuid 10 v7`. Type `v5` or `v3`, a namespace (`dns`, `url`, `oid`, `x500` or a UUID) and a name for a name-based UUID, like `uuid v5 dns example.com`, or `nil` or `max` for the special UUIDs. Paste a UUID or ULID after the keyword to see its version and creation time.
 
 ### JWT
 
@@ -1067,7 +1067,7 @@ Decode a JSON Web Token from the clipboard via the `jwt` keyword: see whether it
 
 ### Regular Expressions
 
-Test a regular expression against the clipboard via the `regex` keyword. Write `/pattern/flags` to set flags, and add ` =&gt; replacement` to replace matches (`$1` and `$&lt;name&gt;` refer to groups, `\n` and `\t` insert a line break or tab). Press &lt;kbd&gt;↩&lt;/kbd&gt; on the summary row to copy every match, one per line.
+Test a regular expression against the clipboard via the `regex` keyword. Write `/pattern/flags` to set flags, and add ` =&gt; replacement` to replace matches (`$1` and `$&lt;name&gt;` refer to groups, `\n` and `\t` insert a line break or tab). End with `/pattern/ =&gt;` to remove the matches. Press &lt;kbd&gt;↩&lt;/kbd&gt; on the summary row to copy every match, one per line.
 
 ### Case
 
@@ -1077,7 +1077,7 @@ Convert text to camelCase, PascalCase, snake_case, CONSTANT_CASE, kebab-case, Ti
 
 Get the MD5, SHA-1, SHA-256, SHA-512 and CRC32 of the clipboard or typed text via the `hash` keyword.
 
-Alternatively, hash a file via the Universal Action. Copy the checksum from a download page first to see whether the file matches.
+Alternatively, hash a file via the Universal Action, or copy it in Finder and use the `hash` keyword. With the Universal Action, copy the checksum from a download page first to see whether the file matches.
 
 ### Encoding
 
@@ -1091,7 +1091,7 @@ Convert Unix timestamps (seconds, milliseconds, microseconds or nanoseconds) and
 
 Compare the last two text entries of Alfred’s Clipboard History (turn it on in Alfred’s Features) via the `diff` keyword. JSON is compared with its keys sorted, so only real changes show.
 
-Alternatively, compare two selected files via the Universal Action.
+Alternatively, compare two selected files via the Universal Action, or copy two files in Finder and use the `diff` keyword.
 
 * &lt;kbd&gt;↩&lt;/kbd&gt; Open the unified diff.
 * &lt;kbd&gt;⌘&lt;/kbd&gt;&lt;kbd&gt;↩&lt;/kbd&gt; Copy the unified diff.
@@ -1524,7 +1524,7 @@ Every keyword can be changed in the Workflow’s Configuration.
 				</array>
 			</dict>
 			<key>description</key>
-			<string>Used to compare side by side. Its command-line tool must be installed.</string>
+			<string>Used to compare side by side. FileMerge needs Xcode, Kaleidoscope its ksdiff tool.</string>
 			<key>label</key>
 			<string>Diff app (⌥↩)</string>
 			<key>type</key>

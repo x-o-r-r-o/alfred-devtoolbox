@@ -46,6 +46,17 @@ function clipboard() {
   return wellFormed(t);
 }
 
+// Files copied in Finder (⌘C): their paths, or [] when the clipboard holds no files
+function clipboardFiles() {
+  const fake = env("DT_TEST_CLIPBOARD_FILES", null); // used by the test suite only (tab-separated)
+  if (fake !== null) return fake ? fake.split("\t") : [];
+  const urls = $.NSPasteboard.generalPasteboard.readObjectsForClassesOptions($([$.NSURL]), $({ NSPasteboardURLReadingFileURLsOnlyKey: true }));
+  if (urls.isNil()) return [];
+  const out = [];
+  for (let i = 0; i < urls.count; i++) out.push(urls.objectAtIndex(i).path.js);
+  return out;
+}
+
 function emptyClip(hint, icon) {
   return clipTooLarge
     ? info("Clipboard is larger than 2 MB", "Copy less text, or type it after the keyword", "error")
@@ -627,6 +638,33 @@ function nanoid(size = 21) {
   return randomBytes(size).map((b) => NANO[b & 63]).join("");
 }
 
+// Name-based UUID (RFC 9562 v3 = MD5, v5 = SHA-1) of a UTF-8 name in a namespace UUID
+const UUID_NS = { dns: "6ba7b810-9dad-11d1-80b4-00c04fd430c8", url: "6ba7b811-9dad-11d1-80b4-00c04fd430c8", oid: "6ba7b812-9dad-11d1-80b4-00c04fd430c8", x500: "6ba7b814-9dad-11d1-80b4-00c04fd430c8" };
+function nameUUID(ver, nsHex, name) {
+  const bin = nsHex.match(/../g).map((x) => String.fromCharCode(parseInt(x, 16))).join("") + toBytes(name);
+  const h = digestData(ver === 3 ? "md5" : "sha1", $(bin).dataUsingEncoding($.NSISOLatin1StringEncoding)).slice(0, 32);
+  const hex = h.slice(0, 12) + ver.toString(16) + h.slice(13, 16) + (8 | (parseInt(h[16], 16) & 3)).toString(16) + h.slice(17);
+  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+}
+
+function nameUUIDItems(query) {
+  const m = query.trim().match(/^v([35])(?:\s+(\S+))?(?:\s+([\s\S]+))?$/i);
+  if (!m) return null;
+  const ver = Number(m[1]);
+  const nsArg = m[2] || "";
+  const nsMatch = nsArg.match(UUID_RE);
+  const nsHex = lookup(UUID_NS, nsArg.toLowerCase()) ? UUID_NS[nsArg.toLowerCase()].replace(/-/g, "") : nsMatch ? nsMatch.slice(1).join("").toLowerCase() : null;
+  const help = `Type a namespace (dns, url, oid, x500 or a UUID) and a name, e.g. v${ver} dns example.com`;
+  if (!nsArg) return [info(`UUID v${ver} (name-based, ${ver === 3 ? "MD5" : "SHA-1"})`, help, "uuid")];
+  if (!nsHex) return [info("Unknown namespace", help, "error")];
+  if (m[3] === undefined) return [info(`Type a name after the namespace`, help, "uuid")];
+  const u = nameUUID(ver, nsHex, m[3]);
+  return [
+    row(`UUID v${ver}: ${u}`, u, `Name-based UUID of “${oneLine(m[3], 60)}” in the ${lookup(UUID_NS, nsArg.toLowerCase()) ? nsArg.toUpperCase() : "given"} namespace`, "uuid"),
+    row(`UUID v${ver} uppercase: ${u.toUpperCase()}`, u.toUpperCase(), "Uppercase", "uuid"),
+  ];
+}
+
 function validDate(ms) {
   return Number.isFinite(ms) && Math.abs(ms) <= 8.64e15;
 }
@@ -682,6 +720,8 @@ function decodeIdItems(text, strict = false) {
 function uuidItems(query) {
   const decoded = decodeIdItems(query);
   if (decoded) return decoded;
+  const named = nameUUIDItems(query);
+  if (named) return named;
   const q = query.trim().toLowerCase();
   const m = q.match(/^(\d+)/);
   const count = Math.min(Math.max(m ? parseInt(m[1], 10) : 1, 1), 1000);
@@ -700,8 +740,15 @@ function uuidItems(query) {
   ];
   for (const it of items) if (count === 1) it.title = `${it.title}: ${it.arg}`;
   if (!filter) return items;
+  // Only when asked for, so they don't crowd the list
+  items.push(
+    row(`Nil UUID: ${"0".repeat(8)}-0000-0000-0000-${"0".repeat(12)}`, "00000000-0000-0000-0000-000000000000", "All zeros (empty UUID)", "uuid", { match: "nil empty zero null" }),
+    row("Max UUID: ffffffff-ffff-ffff-ffff-ffffffffffff", "ffffffff-ffff-ffff-ffff-ffffffffffff", "All ones (RFC 9562)", "uuid", { match: "max" }),
+    info("UUID v5 or v3 from a name", "Type v5 or v3, a namespace (dns, url, oid, x500 or a UUID) and a name", "uuid")
+  );
+  items[items.length - 1].match = "v5 v3 name namespace sha md5";
   const hits = items.filter((it) => filter.split(/\s+/).every((w) => (it.title + " " + it.match).toLowerCase().includes(w)));
-  return hits.length ? hits : [info("Unknown ID type", "Try v4, upper, nodash, v7, ulid or nano. Prefix a number for several, e.g. 5 v7. Paste a UUID or ULID to inspect it", "info")];
+  return hits.length ? hits : [info("Unknown ID type", "Try v4, upper, nodash, v7, ulid, nano, nil, max or v5 dns example.com. Prefix a number for several, e.g. 5 v7", "info")];
 }
 
 // ---------- JWT ----------
@@ -844,6 +891,10 @@ function parseRegex(q) {
     // \n and \t in the replacement insert a line break or tab (they can't be typed in Alfred)
     replacement = q.slice(arrow + 4).replace(/\\([nt\\])/g, (_, c) => (c === "n" ? "\n" : c === "t" ? "\t" : "\\"));
     q = q.slice(0, arrow);
+  } else if (/^\/.*\/[dgimsuyv]* =>$/s.test(q)) {
+    // "/pattern/ => " whose trailing space was trimmed away: replace matches with nothing
+    replacement = "";
+    q = q.slice(0, -3);
   }
   let pattern = q, flags = "g";
   const m = q.match(/^\/(.*)\/([dgimsuyv]*)$/s);
@@ -978,7 +1029,14 @@ function clipboardChecksum() {
 
 function hashItems(query) {
   let data, label, isFile = false;
-  const path = typeof query === "string" ? query.trim().replace(/^~(?=\/)/, $.NSHomeDirectory().js) : "";
+  let path = typeof query === "string" ? query.trim().replace(/^~(?=\/)/, $.NSHomeDirectory().js) : "";
+  let copied = false;
+  if (query === "") {
+    // Nothing typed: a file copied in Finder is hashed rather than its name
+    const files = clipboardFiles();
+    if (files.length > 1) return [info(`${plural(files.length, "file")} copied`, "Copy a single file to hash it, or type text after the keyword", "error")];
+    if (files.length === 1) { path = files[0]; copied = true; }
+  }
   const fm = $.NSFileManager.defaultManager, isDir = Ref();
   if (path.startsWith("/") && fm.fileExistsAtPathIsDirectory(path, isDir)) {
     if (isDir[0]) return [info("That's a folder", "Hash works on a single file", "error")];
@@ -987,7 +1045,7 @@ function hashItems(query) {
     if (Number(attrs.fileSize) > MAX_FILE) return [info("File too large", "Hashing is limited to 1 GB", "error")];
     data = $.NSData.dataWithContentsOfFileOptionsError(path, 1, $());
     if (data.isNil()) return [info("Can't read that file", path, "error")];
-    label = `${path.split("/").pop()} (${plural(Number(data.length), "byte")})`;
+    label = `${copied ? "copied file " : ""}${path.split("/").pop()} (${plural(Number(data.length), "byte")})`;
     isFile = true;
   } else {
     const src = inputOrClipboard(query);
@@ -996,7 +1054,7 @@ function hashItems(query) {
     label = `${src.source} (${plural(Number(data.length), "byte")})`;
   }
   // Compare with a checksum in the clipboard, e.g. copied from a download page
-  const expected = isFile ? clipboardChecksum() : "";
+  const expected = isFile && !copied ? clipboardChecksum() : "";
   const up = (h) => (HASH_UPPER ? h.toUpperCase() : h);
   const items = [];
   let matched = false;
@@ -1125,15 +1183,17 @@ function epochItems(query) {
 
 const MAX_DIFF_FILE = 10 * 1024 * 1024;
 
+// The last `limit` text entries, "missing" when Clipboard History is off, or "error" when the database can't be read
 function clipboardHistory(limit) {
-  const db = `${$.NSHomeDirectory().js}/Library/Application Support/Alfred/Databases/clipboard.alfdb`;
-  if (!$.NSFileManager.defaultManager.fileExistsAtPath(db)) return null;
-  const out = pipe("/usr/bin/sqlite3", ["-readonly", "-json", db, `SELECT item FROM clipboard WHERE dataType = 0 ORDER BY ts DESC LIMIT ${Number(limit)};`]);
-  if (out === null) return null;
+  const db = env("DT_TEST_CLIPBOARD_DB", `${$.NSHomeDirectory().js}/Library/Application Support/Alfred/Databases/clipboard.alfdb`);
+  if (!$.NSFileManager.defaultManager.fileExistsAtPath(db)) return "missing";
+  // Alfred writes to this database (rollback journal): wait up to 1 s for its lock instead of failing at once
+  const out = pipe("/usr/bin/sqlite3", ["-readonly", "-json", "-cmd", ".timeout 1000", db, `SELECT item FROM clipboard WHERE dataType = 0 ORDER BY ts DESC LIMIT ${Number(limit)};`]);
+  if (out === null) return "error";
   try {
     return out ? JSON.parse(out).map((r) => r.item) : [];
   } catch (e) {
-    return null;
+    return "error";
   }
 }
 
@@ -1170,7 +1230,12 @@ function diffStats(d) {
 }
 
 function diffItems(query) {
-  const files = query.split("\t").map((f) => f.trim()).filter(Boolean);
+  let files = query.split("\t").map((f) => f.trim()).filter(Boolean);
+  if (!files.length) {
+    // Nothing typed: two files copied in Finder are compared instead of Clipboard History
+    const copied = clipboardFiles();
+    if (copied.length === 2) files = copied;
+  }
   const pathLike = files.length > 1 && files.every((f) => f.startsWith("/"));
   if (pathLike && files.length !== 2) return [info("Select exactly two files", `${plural(files.length, "file")} selected`, "error")];
   let a, b, la, lb;
@@ -1190,7 +1255,8 @@ function diffItems(query) {
     lb = files[1].split("/").pop().replace(/[^\w.-]/g, "_").slice(0, 100) + ".b";
   } else {
     const h = clipboardHistory(2);
-    if (h === null) return [info("Alfred's Clipboard History is not available", "Turn it on in Alfred Preferences → Features → Clipboard History, or select two files and use the Universal Action", "error")];
+    if (h === "missing") return [info("Alfred's Clipboard History is not available", "Turn it on in Alfred Preferences → Features → Clipboard History, or copy two files in Finder", "error")];
+    if (h === "error") return [info("Couldn't read Alfred's Clipboard History", "The database is busy or unreadable. Try again in a moment", "error")];
     if (h.length < 2) return [info("Need two text entries in Clipboard History", "Copy the two texts to compare, then try again", "info")];
     b = h[0];
     a = h[1];
@@ -1231,6 +1297,29 @@ function diffItems(query) {
   ];
 }
 
+// Side-by-side apps. Alfred's PATH has no Homebrew or /usr/local/bin, so the command-line tool is looked up
+// in the usual folders and then inside the app bundle (VS Code and BBEdit ship theirs there).
+const DIFF_APPS = {
+  filemerge: { name: "FileMerge", tool: "opendiff", dirs: ["/usr/bin"] },
+  vscode: { name: "Visual Studio Code", tool: "code", args: ["--diff"], bundle: ["com.microsoft.VSCode", "Contents/Resources/app/bin/code"] },
+  kaleidoscope: { name: "Kaleidoscope", tool: "ksdiff" },
+  bbedit: { name: "BBEdit", tool: "bbdiff", bundle: ["com.barebones.bbedit", "Contents/Helpers/bbdiff"] },
+};
+const TOOL_PATH = "/usr/local/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin";
+
+function findTool(spec) {
+  const fm = $.NSFileManager.defaultManager;
+  const testDirs = env("DT_TEST_TOOL_DIRS", null); // used by the test suite only: never looks at real apps
+  const dirs = testDirs !== null ? testDirs.split(":") : spec.dirs || TOOL_PATH.split(":");
+  for (const d of dirs) if (fm.isExecutableFileAtPath(`${d}/${spec.tool}`)) return `${d}/${spec.tool}`;
+  if (spec.bundle && testDirs === null) {
+    const app = $.NSWorkspace.sharedWorkspace.URLForApplicationWithBundleIdentifier(spec.bundle[0]);
+    const p = app.isNil() ? "" : `${app.path.js}/${spec.bundle[1]}`;
+    if (p && fm.isExecutableFileAtPath(p)) return p;
+  }
+  return null;
+}
+
 // Action for the diff result: open / copy / app
 function diffAction(arg) {
   const action = env("diff_action", "open");
@@ -1245,26 +1334,20 @@ function diffAction(arg) {
     return "Diff copied";
   }
   if (action === "app") {
-    const app = env("diff_app", "filemerge");
-    const cmds = {
-      filemerge: ["/usr/bin/opendiff", [a, b]],
-      vscode: ["/usr/bin/env", ["code", "--diff", a, b]],
-      kaleidoscope: ["/usr/bin/env", ["ksdiff", a, b]],
-      bbedit: ["/usr/bin/env", ["bbdiff", a, b]],
-    };
-    const [cmd, args] = lookup(cmds, app) || cmds.filemerge;
+    const spec = lookup(DIFF_APPS, env("diff_app", "filemerge").trim()) || DIFF_APPS.filemerge;
+    const cmd = findTool(spec);
+    if (!cmd) return spec === DIFF_APPS.filemerge ? "FileMerge needs Xcode installed" : `${spec.name}: its command-line tool (${spec.tool}) is not installed`;
     const t = $.NSTask.alloc.init;
     t.executableURL = $.NSURL.fileURLWithPath(cmd);
-    t.arguments = args;
+    t.arguments = [...(spec.args || []), a, b];
     const env2 = $.NSMutableDictionary.dictionaryWithDictionary(ENV);
-    env2.setObjectForKey("/usr/local/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin", "PATH");
+    env2.setObjectForKey(TOOL_PATH, "PATH"); // "code" and friends are scripts that look up helpers on PATH
     t.environment = env2;
-    t.standardOutput = $.NSFileHandle.fileHandleWithNullDevice;
+    t.standardOutput = $.NSFileHandle.fileHandleWithNullDevice; // not a pipe: opendiff returns at once instead of waiting for FileMerge
     t.standardError = $.NSFileHandle.fileHandleWithNullDevice;
-    if (!t.launchAndReturnError($())) return `Could not start ${app}`;
+    if (!t.launchAndReturnError($())) return `Could not start ${spec.name}`;
     t.waitUntilExit;
-    if (app !== "filemerge" && t.terminationStatus !== 0) return `${app} command-line tool not found`;
-    if (app === "filemerge" && t.terminationStatus !== 0) return "FileMerge needs Xcode installed";
+    if (t.terminationStatus !== 0) return spec === DIFF_APPS.filemerge ? "FileMerge needs Xcode installed" : `${spec.name} could not open the comparison`;
     return "";
   }
   // No app registered for .diff files: fall back to the default text editor
@@ -1304,7 +1387,7 @@ function smartItems(query) {
     const list = TOOLS.filter(([k, name]) => !f || k.startsWith(f) || name.toLowerCase().startsWith(f));
     if (list.length || !t) {
       const menu = list.map(([k, name, sub, icon]) => {
-        const kw = env("keyword_" + k, k);
+        const kw = env("keyword_" + k, "").trim() || k; // a required keyword can still arrive empty
         return { title: `${name}  ·  ${kw}`, subtitle: sub, autocomplete: `${k} `, valid: false, icon: { path: `icons/${icon}.png` } };
       });
       if (clipTooLarge && !f) menu.unshift(emptyClip("", "error"));
@@ -1346,7 +1429,8 @@ function run(argv) {
       case "diff": return output(diffItems(query));
       case "case": return output(caseItems(query));
       case "smart": return output(smartItems(query));
-      case "diff-action": return diffAction(query);
+      // Nothing is printed on success: osascript would print "\n" for "", which could show an empty notification
+      case "diff-action": return diffAction(query) || undefined;
       default: return output([info(`Unknown command: ${cmd}`, "", "error")]);
     }
   } catch (e) {

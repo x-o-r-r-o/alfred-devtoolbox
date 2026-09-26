@@ -24,7 +24,8 @@ def scriptfilter(o):
         "alfredfiltersresults": o.get("alfredfilters", False),
         "alfredfiltersresultsmatchmode": 0,
         "argumenttreatemptyqueryasnil": True,
-        "argumenttrimmode": 0,
+        # 0 = trim irrelevant (trailing) spaces, 1 = don't trim: spaces are significant (e.g. a regex)
+        "argumenttrimmode": o.get("trimmode", 0),
         "argumenttype": {"required": 0, "optional": 1, "none": 2}[o.get("argument", "optional")],
         "escaping": 102,
         "keyword": o["keyword"],

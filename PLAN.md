@@ -32,6 +32,17 @@ Raycast demand this workflow replaces (downloads, 2026-09-26):
 - [x] Universal Actions: Transform (text), Diff (two files), Hash (one file)
 - [x] ↩ copy, ⌘↩ paste, ⌘C / ⌘L via `text`; results > 50 KB go through the cache + `resolve.sh`
 
+## Round 4 (post-release audit, v1.0.1 / v1.1 candidates)
+- [x] Alfred's runtime: every Script Filter and action run with `env -i` (no LANG, no Homebrew on PATH), Alfred's variables and cache/data paths with spaces, fresh install (no cache folder yet); covered by `Round4Tests`
+- [x] Fix: `/pattern/ =>` removes matches (Alfred trims the trailing space of ` => `); the `regex` Script Filter no longer trims spaces (`argumenttrimmode` 1)
+- [x] Fix: Clipboard History read waits up to 1 s for Alfred's database lock, and a busy database no longer says "turn Clipboard History on"
+- [x] Fix: ⌥↩ finds `code` / `bbdiff` outside Alfred's PATH (inside the app bundle), and names the missing tool
+- [x] Fix: the diff action prints nothing on success (a JXA "" prints "\n": possible blank notification)
+- [x] Fix: an empty or space-padded keyword setting falls back to the default in the `dev` menu
+- [x] New: `uuid v5|v3 <namespace> <name>` (name-based UUIDs), `uuid nil`, `uuid max`
+- [x] New: `hash` hashes a file copied in Finder (instead of its name)
+- [x] New: `diff` compares two files copied in Finder
+
 ## Tech
 - **Stack:** JXA (`osascript -l JavaScript`) with the ObjC bridge: CommonCrypto (hashes, HMAC), zlib CRC32, NSPasteboard, NSTask. Bash for `resolve.sh`.
 - **Dependencies:** none at runtime. `/usr/bin/sqlite3` (ships with macOS) reads Alfred's Clipboard History; the ⌥↩ diff apps are optional.
@@ -43,7 +54,7 @@ Raycast demand this workflow replaces (downloads, 2026-09-26):
 - `diff` writes the compared texts (which may come from Clipboard History) to the workflow cache folder; they are replaced by the next diff and never leave the Mac.
 - `hash` treats a typed query that is an existing absolute path as a file.
 - The ULID and UUID v7 generators are not monotonic within one millisecond across separate runs (batches are sorted).
-- Regex uses JavaScriptCore semantics; the `v` flag needs a newer macOS than 13.
+- Regex uses JavaScriptCore semantics: lookbehind needs macOS 13.3+ (Safari 16.4's JavaScriptCore) and the `v` flag macOS 14+; older systems report "Invalid regular expression". Everything else the workflow uses is available on macOS 13.0 (`String.prototype.toWellFormed` is feature-detected; sqlite3 3.39 on macOS 13 supports `-json`).
 
 ## Verify in real Alfred
 - [ ] Universal Action "Diff with DevToolbox" with two files selected in Finder passes both paths (tab-separated or as separate arguments).
@@ -53,6 +64,8 @@ Raycast demand this workflow replaces (downloads, 2026-09-26):
 - [ ] `epoch` with an empty query refreshes every second (`rerun`).
 - [ ] Workflow Configuration: changing a keyword, JSON indent, uppercase hashes and the diff app takes effect.
 - [ ] Screenshots for every `images/*.png` referenced in the README.
+- [ ] `regex a  => ` keeps the trailing spaces with "Don't trim arg spaces" (`argumenttrimmode` 1 is the second entry of Alfred's popup; confirm it shows as selected in the Script Filter).
+- [ ] `hash` / `diff` with files copied in Finder; ⌥↩ with VS Code installed but no `code` command in PATH.
 
 ## Release checklist (Alfred forum + Gallery)
 Sources: alfred.app/submit, alfred.app/submit/styleguide, alfred.app/submit/screenshots, alfredforum.com topics 23976 and 23388.
@@ -71,3 +84,14 @@ Sources: alfred.app/submit, alfred.app/submit/styleguide, alfred.app/submit/scre
 - [x] Version 1.0.0 in `workflow.json`; `python3 tools/build.py --package` builds `dist/alfred-devtoolbox-1.0.0.alfredworkflow`
 - [ ] GitHub release with the `.alfredworkflow` attached (by the author)
 - [ ] Forum post in "Share your Workflows" with a screenshot, keywords, and the GitHub link (by the author)
+
+## Ideas for v1.1
+Ranked by value for effort (Raycast issues for Format JSON, UUID Generator, JWT Decoder, Change Case, Diff Checker, Unix Timestamp; 2026-09).
+1. JSON path query (`json .users[0].name`): the most common request for JSON tools after formatting.
+2. Epoch arithmetic and formats: `epoch now+2h`, `epoch 2024-01-01 in Asia/Tokyo`, custom strftime-style output.
+3. Diff app choices: Cursor, Zed, Sublime Merge; and a Text View (Alfred 5.5) preview of the diff with colours.
+4. Prettier-style compact arrays (`[1, 2, 3]` on one line) as a JSON indent option (raycast/extensions#23449).
+5. HMAC of text with a typed key (`hash key=<secret>`) through CommonCrypto, and SHA-224/SHA-384.
+6. JWT: RS256/ES256 verification with a pasted public key (Security framework), and building/signing an HS256 token.
+7. Hash several copied files at once (checksum list output like `shasum`).
+8. Prune `result-*.txt` in the cache after a day (they hold clipboard-derived text; the count is already bounded).
