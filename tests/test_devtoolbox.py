@@ -226,7 +226,9 @@ class DiffTests(unittest.TestCase):
         write(b, "one\nthree\n")
         it = sf("diff", f"{a}\t{b}")
         self.assertTrue(it[0]["title"].startswith("+1 −1"))
-        self.assertIn("+three", it[0]["arg"])
+        self.assertIn("+three", it[0]["text"]["copy"])
+        with open(it[0]["arg"]) as f:  # the diff travels as a file, not inline
+            self.assertIn("+three", f.read())
         self.assertEqual(it[0]["variables"]["diff_action"], "open")
         self.assertEqual(it[0]["mods"]["alt"]["variables"]["diff_action"], "app")
 
@@ -356,6 +358,246 @@ class PlistTests(unittest.TestCase):
         self.assertNotIn("alfredapp", p["bundleid"])
         out = subprocess.run(["sips", "-g", "pixelWidth", os.path.join(SRC, "icon.png")], capture_output=True, text=True).stdout
         self.assertGreaterEqual(int(out.split()[-1]), 256)
+
+
+def run_raw(args, clipboard="", **env):
+    e = dict(os.environ, DT_TEST_CLIPBOARD=clipboard, alfred_workflow_cache=CACHE, **env)
+    return subprocess.run(["osascript", "-l", "JavaScript", "./devtoolbox.js", *args], cwd=SRC, env=e,
+                          capture_output=True, text=True, timeout=30)
+
+
+def b64url(obj):
+    import base64
+    raw = obj if isinstance(obj, bytes) else json.dumps(obj).encode()
+    return base64.urlsafe_b64encode(raw).decode().rstrip("=")
+
+
+def hs256(header, payload, secret):
+    import hashlib, hmac, base64
+    msg = f"{b64url(header)}.{b64url(payload)}"
+    sig = base64.urlsafe_b64encode(hmac.new(secret.encode(), msg.encode(), hashlib.sha256).digest()).decode().rstrip("=")
+    return f"{msg}.{sig}"
+
+
+class RegressionTests(unittest.TestCase):
+    """One test per bug found in the audit."""
+
+    def test_json_keeps_big_and_exotic_numbers(self):
+        src = '{"id": 12345678901234567890, "f": 1.0, "e": 1e400, "n": -0, "ok": 1.5}'
+        it = sf("json", clipboard=src)
+        self.assertEqual(find(it, "Minify")["arg"], '{"id":12345678901234567890,"f":1.0,"e":1e400,"n":-0,"ok":1.5}')
+        self.assertIn("12345678901234567890", find(it, "Pretty")["arg"])
+        self.assertIn("id: number;", find(it, "TypeScript")["arg"])
+        self.assertEqual(json.loads(find(it, "Escape")["arg"]), '{"id":12345678901234567890,"f":1.0,"e":1e400,"n":-0,"ok":1.5}')
+        it = sf("json", clipboard='[{"a": 90071992547409931}]')
+        self.assertEqual(find(it, "CSV")["arg"], "a\n90071992547409931")
+        self.assertEqual(find(it, "JSON Lines")["arg"], '{"a":90071992547409931}')
+
+    def test_json_proto_key_not_lost(self):
+        it = sf("json", "sort", clipboard='{"__proto__": {"x": 1}, "b": 2}')
+        self.assertEqual(json.loads(it[0]["arg"]), {"__proto__": {"x": 1}, "b": 2})
+
+    def test_json_duplicate_keys_warned(self):
+        it = sf("json", clipboard='{"a": 1, "b": {"a": 1}, "a": 2}')
+        self.assertIn('Duplicate key "a"', it[0]["subtitle"])
+        self.assertNotIn("Duplicate", sf("json", clipboard='{"a": {"a": 1}, "b": [{"a": 1}, {"a": 2}]}')[0]["subtitle"])
+
+    def test_json_null_kind(self):
+        self.assertEqual(sf("json", clipboard="null")[0]["title"], "Valid JSON · null")
+
+    def test_relaxed_json_respects_strings(self):
+        it = sf("json", clipboard="{a: \"b // c\", u: 'http://x.com/a', w: 'x, }', c: \"/* no */\", // real\n t: [1,],}")
+        self.assertEqual(json.loads(find(it, "Minify")["arg"]),
+                         {"a": "b // c", "u": "http://x.com/a", "w": "x, }", "c": "/* no */", "t": [1]})
+        it = sf("json", clipboard="{s: 'say \"hi\"', q: 'it\\'s'}")
+        self.assertEqual(json.loads(find(it, "Minify")["arg"]), {"s": 'say "hi"', "q": "it's"})
+
+    def test_json_error_position(self):
+        it = sf("json", clipboard='{"a": 1\n "b": 2}')
+        self.assertEqual(it[0]["title"], "Invalid JSON")
+        self.assertIn("line 2, column 2", it[0]["subtitle"])
+
+    def test_json_huge_string(self):
+        big = os.path.join(CACHE, "bigstr.json")
+        write(big, json.dumps({"s": "x" * 1500000, "n": 12345678901234567890}))
+        e = dict(os.environ, DT_TEST_CLIPBOARD_FILE=big, alfred_workflow_cache=CACHE)
+        out = subprocess.run(["osascript", "-l", "JavaScript", "./devtoolbox.js", "json", ""], cwd=SRC, env=e, capture_output=True, text=True)
+        items = json.loads(out.stdout)["items"]
+        self.assertTrue(items[0]["title"].startswith("Valid JSON"))
+        r = subprocess.run(["./resolve.sh", find(items, "Minify")["arg"]], cwd=SRC, env=e, capture_output=True, text=True)
+        self.assertTrue(r.stdout.endswith('"n":12345678901234567890}'))
+
+    def test_csv_keeps_leading_zeros(self):
+        it = sf("json", clipboard="zip,n\n01234,5\n00501,1.50")
+        self.assertEqual(json.loads(find(it, "CSV → JSON")["arg"]), [{"zip": "01234", "n": 5}, {"zip": "00501", "n": "1.50"}])
+
+    def test_csv_quoted_newlines(self):
+        it = sf("json", clipboard='a,b\n"line1\nline2",2\n3,4')
+        self.assertEqual(json.loads(find(it, "CSV → JSON")["arg"]), [{"a": "line1\nline2", "b": 2}, {"a": 3, "b": 4}])
+
+    def test_case_keeps_combining_marks(self):
+        a = args(sf("case", clipboard="café au lait"))
+        self.assertIn("café_au_lait", a)
+        self.assertIn("caféAuLait", a)
+
+    def test_jwt_non_object_parts(self):
+        none = b64url({"alg": "none"})
+        it = sf("jwt", clipboard=f"{none}.{b64url(b'null')}.")
+        self.assertEqual(it[0]["title"], "Payload is not a JSON object")
+        self.assertTrue(any(i["title"].startswith("⚠ Unsigned") for i in it))
+        it = sf("jwt", clipboard=f"{none}.{b64url(b'hello world')}.")
+        self.assertEqual(find(it, "Payload (not JSON)")["arg"], "hello world")
+        self.assertEqual(sf("jwt", clipboard=f"{b64url(b'null')}.{b64url({'a': 1})}.")[0]["title"], "Could not decode JWT")
+
+    def test_jwt_out_of_range_dates(self):
+        it = sf("jwt", clipboard=f"{b64url({'alg': 'HS256'})}.{b64url({'exp': 1e20, 'iat': -1e20})}.x")
+        self.assertNotEqual(it[0]["title"], "DevToolbox error")
+        self.assertEqual(find(it, "Expires (exp)")["arg"], "100000000000000000000")
+
+    def test_jwt_not_yet_valid(self):
+        import time
+        it = sf("jwt", clipboard=f"{b64url({'alg': 'HS256'})}.{b64url({'nbf': int(time.time()) + 3600, 'exp': int(time.time()) + 7200})}.x")
+        self.assertTrue(it[0]["title"].startswith("Not valid yet"))
+
+    def test_jwt_quotes_and_header_prefix(self):
+        self.assertTrue(sf("jwt", clipboard=f'Authorization: Bearer "{JWT}"')[0]["title"].startswith("Expired"))
+
+    def test_enc_invalid_code_points_do_not_crash(self):
+        it = sf("enc", clipboard="&#99999999; &#65; \\u{110000} \\u0041")
+        self.assertIn("&#99999999; A", find(it, "HTML decode")["arg"])
+        self.assertIn("\\u{110000} A", find(it, "Unicode unescape")["arg"])
+        self.assertEqual(find(sf("enc", clipboard="\\u{110000}\\n"), "Backslash unescape")["arg"], "\\u{110000}\n")
+
+    def test_enc_no_false_hex_and_negative_numbers(self):
+        titles = [i["title"] for i in sf("enc", clipboard="2024")]
+        self.assertFalse(any(t.startswith("Hex decode") for t in titles))
+        a = args(sf("enc", "-5"))
+        self.assertIn("-0x5", a)
+        self.assertIn("-0b101", a)
+        self.assertIn("0x18ee90ff6c373e0ee4e3f0ad2", args(sf("enc", "123456789012345678901234567890")))
+
+    def test_smart_domain_is_not_a_jwt(self):
+        it = sf("smart", clipboard="www.example-domain.com")
+        self.assertFalse(any("JWT" in i["title"] for i in it))
+
+    def test_smart_does_not_delegate_multiline_or_useless(self):
+        it = sf("smart", "json is great\nreally", clipboard="")
+        self.assertTrue(any(i["title"].startswith("SHA-256") for i in it))
+        import hashlib
+        it = sf("smart", "uuid are cool", clipboard="")
+        self.assertEqual(find(it, "SHA-256")["arg"], hashlib.sha256(b"uuid are cool").hexdigest())
+
+    def test_diff_rejects_wrong_file_count(self):
+        d = tempfile.mkdtemp()
+        fs = [os.path.join(d, n) for n in "abc"]
+        for f in fs:
+            write(f, f)
+        self.assertEqual(sf("diff", "\t".join(fs))[0]["title"], "Select exactly two files")
+
+    def test_diff_files_as_separate_args_and_dash_names(self):
+        d = tempfile.mkdtemp()
+        a, b = os.path.join(d, "-q"), os.path.join(d, "--version")
+        write(a, "one\n")
+        write(b, "two\n")
+        out = run_raw(["diff", a, b])
+        it = json.loads(out.stdout)["items"]
+        self.assertTrue(it[0]["title"].startswith("+1 −1"), it)
+
+    def test_diff_action_copy_reads_file(self):
+        d = tempfile.mkdtemp()
+        a, b = os.path.join(d, "a"), os.path.join(d, "b")
+        write(a, "x\n")
+        write(b, "y\n")
+        it = sf("diff", f"{a}\t{b}")[0]
+        self.assertTrue(os.path.exists(it["variables"]["diff_file"]))
+
+    def test_resolve_only_reads_cache_results(self):
+        e = dict(os.environ, alfred_workflow_cache=CACHE)
+        os.makedirs(os.path.join(CACHE, "result-"), exist_ok=True)
+        sneaky = f"dtfile:{CACHE}/result-/../bigstr.json"
+        r = subprocess.run(["./resolve.sh", sneaky], cwd=SRC, env=e, capture_output=True, text=True)
+        self.assertEqual(r.stdout, sneaky)
+
+    def test_regex_catastrophic_backtracking_is_reported(self):
+        it = sf("regex", "(a+)+$", clipboard="a" * 40 + "b")
+        self.assertTrue(it[0]["title"].startswith("⚠ Pattern too slow"))
+
+    def test_regex_watchdog(self):
+        import time
+        t = time.time()
+        out = run_raw(["regex", "x"], clipboard="x", DT_TEST_HANG="1")
+        self.assertLess(time.time() - t, 8)
+        self.assertTrue(json.loads(out.stdout)["items"][0]["title"].startswith("⚠ Pattern too slow"))
+
+    def test_regex_unicode_empty_matches(self):
+        it = sf("regex", "/x*/gu", clipboard="😀a")
+        self.assertTrue(it[0]["title"].startswith("3 matches"))
+
+    def test_clipboard_too_large(self):
+        big = os.path.join(CACHE, "huge.txt")
+        write(big, "a" * (2 * 1024 * 1024 + 10))
+        e = dict(os.environ, DT_TEST_CLIPBOARD_FILE=big, alfred_workflow_cache=CACHE)
+        out = subprocess.run(["osascript", "-l", "JavaScript", "./devtoolbox.js", "case", ""], cwd=SRC, env=e, capture_output=True, text=True)
+        self.assertEqual(json.loads(out.stdout)["items"][0]["title"], "Clipboard is larger than 2 MB")
+
+    def test_lone_surrogates_in_output(self):
+        out = run_raw(["enc", "\\ud800x"])
+        self.assertEqual(out.returncode, 0)
+        self.assertNotIn("\\ud800", out.stdout.lower().replace("\\\\ud800", ""))
+        self.assertEqual(find(json.loads(out.stdout)["items"], "Unicode unescape")["arg"], "�x")
+
+    def test_hash_big_file_crc_matches_zlib(self):
+        import zlib, hashlib
+        f = os.path.join(CACHE, "big.bin")
+        blob = os.urandom(1024 * 1024) * 20
+        write(f, blob)
+        it = sf("hash", f)
+        self.assertEqual(find(it, "CRC32")["arg"], format(zlib.crc32(blob), "08x"))
+        self.assertEqual(find(it, "MD5")["arg"], hashlib.md5(blob).hexdigest())
+
+
+class FeatureTests(unittest.TestCase):
+    def test_jwt_verify_hs256(self):
+        tok = hs256({"alg": "HS256", "typ": "JWT"}, {"sub": "1"}, "s3cret")
+        self.assertTrue(any(i["title"] == "✓ Signature verified (HS256)" for i in sf("jwt", "s3cret", clipboard=tok)))
+        self.assertTrue(any(i["title"] == "✗ Invalid signature (HS256)" for i in sf("jwt", f"{tok} nope")))
+        it = sf("jwt", clipboard=tok)
+        self.assertIn("type the secret", it[0]["subtitle"])
+
+    def test_uuid_decode(self):
+        import uuid as U
+        u1 = U.uuid1()
+        it = sf("uuid", str(u1).upper())
+        self.assertEqual(it[0]["title"], "UUID version 1 · RFC 9562")
+        import datetime
+        ms = (u1.time - 0x01B21DD213814000) // 10000
+        self.assertEqual(find(it, "Created (Unix ms)")["arg"], str(ms))
+        self.assertIn(u1.urn, args(it))
+        it = sf("uuid", "01ARZ3NDEKTSV4RRFFQ69G5FAV")
+        self.assertEqual(find(it, "Created (Unix ms)")["arg"], "1469922850259")
+        v7 = find(sf("uuid"), "UUID v7")["arg"]
+        self.assertTrue(sf("smart", clipboard=v7)[0]["title"].startswith("UUID version 7"))
+
+    def test_uuid_batches_sorted(self):
+        for kind in ("v7", "ulid"):
+            ids = sf("uuid", f"300 {kind}")[0]["arg"].split("\n")
+            self.assertEqual(ids, sorted(ids))
+
+    def test_checksum_from_shasum_output(self):
+        import hashlib
+        f = os.path.join(CACHE, "dl.bin")
+        write(f, b"payload")
+        digest = hashlib.sha256(b"payload").hexdigest()
+        self.assertTrue(sf("hash", f, clipboard=f"{digest}  dl.bin\n")[0]["title"].startswith("✓"))
+        self.assertTrue(sf("hash", f, clipboard=f"SHA256 (dl.bin) = {digest}")[0]["title"].startswith("✓"))
+
+    def test_regex_replacement_escapes(self):
+        it = sf("regex", r"/,\s*/ => \n", clipboard="a, b,c")
+        self.assertEqual(it[0]["arg"], "a\nb\nc")
+
+    def test_text_stats(self):
+        it = sf("case", "héllo 👋🏽 world\nbye")
+        self.assertEqual(it[-1]["title"], "17 characters · 3 words · 2 lines · 25 bytes UTF-8")
 
 
 if __name__ == "__main__":
