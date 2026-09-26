@@ -1,0 +1,58 @@
+{
+  "icon": [
+    "wrench.and.screwdriver.fill",
+    "#4F46E5"
+  ],
+  "json": [
+    "curlybraces",
+    "#D97706"
+  ],
+  "ts": [
+    "chevron.left.forwardslash.chevron.right",
+    "#2563EB"
+  ],
+  "uuid": [
+    "number",
+    "#7C3AED"
+  ],
+  "jwt": [
+    "key.horizontal.fill",
+    "#DB2777"
+  ],
+  "regex": [
+    "text.magnifyingglass",
+    "#0891B2"
+  ],
+  "hash": [
+    "number.square.fill",
+    "#475569"
+  ],
+  "enc": [
+    "arrow.left.arrow.right",
+    "#059669"
+  ],
+  "clock": [
+    "clock.fill",
+    "#EA580C"
+  ],
+  "diff": [
+    "plus.forwardslash.minus",
+    "#0D9488"
+  ],
+  "info": [
+    "info.circle.fill",
+    "#64748B"
+  ],
+  "ok": [
+    "checkmark.circle.fill",
+    "#16A34A"
+  ],
+  "error": [
+    "exclamationmark.triangle.fill",
+    "#DC2626"
+  ],
+  "case": [
+    "textformat",
+    "#9333EA"
+  ]
+}

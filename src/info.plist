@@ -5,50 +5,1263 @@
 	<key>bundleid</key>
 	<string>io.github.x-o-r-r-o.devtoolbox</string>
 	<key>category</key>
-	<string>Productivity</string>
+	<string>Tools</string>
 	<key>connections</key>
-	<dict/>
+	<dict>
+		<key>1A5132AB-60D0-56A2-9D0B-3F56841A3180</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>EC770113-FD73-5622-9C53-1B3026112785</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
+		<key>3E28DA7B-A607-5484-8DDB-365B69C6EE9B</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>9C8EA8E0-EFA1-5803-8BC9-B527F07AF094</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
+		<key>3F6F42E9-5EAA-5AFE-AC86-CA66A9930092</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>5624E2CE-31AD-5DB0-8D43-3DB11D3D0C8D</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
+		<key>3FE5EAAA-1A96-53F4-A25E-A05ACCD05380</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>3E28DA7B-A607-5484-8DDB-365B69C6EE9B</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+			<dict>
+				<key>destinationuid</key>
+				<string>1A5132AB-60D0-56A2-9D0B-3F56841A3180</string>
+				<key>modifiers</key>
+				<integer>1048576</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
+		<key>5624E2CE-31AD-5DB0-8D43-3DB11D3D0C8D</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>3E28DA7B-A607-5484-8DDB-365B69C6EE9B</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+			<dict>
+				<key>destinationuid</key>
+				<string>1A5132AB-60D0-56A2-9D0B-3F56841A3180</string>
+				<key>modifiers</key>
+				<integer>1048576</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
+		<key>5D0277E9-5497-5D57-A3BC-C0FD9AEA6336</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>3E28DA7B-A607-5484-8DDB-365B69C6EE9B</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+			<dict>
+				<key>destinationuid</key>
+				<string>1A5132AB-60D0-56A2-9D0B-3F56841A3180</string>
+				<key>modifiers</key>
+				<integer>1048576</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
+		<key>6BE110CC-4418-5A8A-A3F9-E611FC509CC5</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>3E28DA7B-A607-5484-8DDB-365B69C6EE9B</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+			<dict>
+				<key>destinationuid</key>
+				<string>1A5132AB-60D0-56A2-9D0B-3F56841A3180</string>
+				<key>modifiers</key>
+				<integer>1048576</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
+		<key>71FD1C77-368F-5423-B05D-4F219DD853B4</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>5D0277E9-5497-5D57-A3BC-C0FD9AEA6336</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
+		<key>A84CFB16-6CBC-5651-A7DE-65DB837CB975</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>3E28DA7B-A607-5484-8DDB-365B69C6EE9B</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+			<dict>
+				<key>destinationuid</key>
+				<string>1A5132AB-60D0-56A2-9D0B-3F56841A3180</string>
+				<key>modifiers</key>
+				<integer>1048576</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
+		<key>AF698C28-4147-5988-84EB-07868CAC00DC</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>3E28DA7B-A607-5484-8DDB-365B69C6EE9B</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+			<dict>
+				<key>destinationuid</key>
+				<string>1A5132AB-60D0-56A2-9D0B-3F56841A3180</string>
+				<key>modifiers</key>
+				<integer>1048576</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
+		<key>B415C09F-D8DA-5442-94F3-D6FF9D878B9C</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>E6A700E9-9332-507B-8CA1-DF280CE2E37E</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+			<dict>
+				<key>destinationuid</key>
+				<string>E6A700E9-9332-507B-8CA1-DF280CE2E37E</string>
+				<key>modifiers</key>
+				<integer>1048576</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+			<dict>
+				<key>destinationuid</key>
+				<string>E6A700E9-9332-507B-8CA1-DF280CE2E37E</string>
+				<key>modifiers</key>
+				<integer>524288</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
+		<key>B87C42D4-1C24-5A10-9E7B-D9BA21D529FC</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>3E28DA7B-A607-5484-8DDB-365B69C6EE9B</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+			<dict>
+				<key>destinationuid</key>
+				<string>1A5132AB-60D0-56A2-9D0B-3F56841A3180</string>
+				<key>modifiers</key>
+				<integer>1048576</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
+		<key>D655C771-7DB7-549C-852F-6D23C2AABF6E</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>3E28DA7B-A607-5484-8DDB-365B69C6EE9B</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+			<dict>
+				<key>destinationuid</key>
+				<string>1A5132AB-60D0-56A2-9D0B-3F56841A3180</string>
+				<key>modifiers</key>
+				<integer>1048576</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
+		<key>D98CF2C7-B248-5CCA-B029-9F64C25B09A3</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>3E28DA7B-A607-5484-8DDB-365B69C6EE9B</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+			<dict>
+				<key>destinationuid</key>
+				<string>1A5132AB-60D0-56A2-9D0B-3F56841A3180</string>
+				<key>modifiers</key>
+				<integer>1048576</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
+		<key>DB303AD3-B3CE-5906-BA77-97BB95B8E207</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>B415C09F-D8DA-5442-94F3-D6FF9D878B9C</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
+		<key>E6A700E9-9332-507B-8CA1-DF280CE2E37E</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>D5414F1F-0DC7-569F-A0AF-A57341905C4D</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
+	</dict>
 	<key>createdby</key>
 	<string>x-o-r-r-o</string>
 	<key>description</key>
-	<string>One workflow for everyday developer transforms: JSON, UUID, JWT, regex, hashes, encoding, timestamps, diff.</string>
+	<string>Format JSON, generate UUIDs, decode JWTs, test regex, change case, hash, encode, convert timestamps and diff text</string>
+	<key>disabled</key>
+	<false/>
 	<key>name</key>
 	<string>DevToolbox</string>
 	<key>objects</key>
-	<array/>
+	<array>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>alfredfiltersresults</key>
+				<false/>
+				<key>alfredfiltersresultsmatchmode</key>
+				<integer>0</integer>
+				<key>argumenttreatemptyqueryasnil</key>
+				<false/>
+				<key>argumenttrimmode</key>
+				<integer>0</integer>
+				<key>argumenttype</key>
+				<integer>1</integer>
+				<key>escaping</key>
+				<integer>102</integer>
+				<key>keyword</key>
+				<string>{var:keyword_dev}</string>
+				<key>queuedelaycustom</key>
+				<integer>3</integer>
+				<key>queuedelayimmediatelyinitially</key>
+				<true/>
+				<key>queuedelaymode</key>
+				<integer>0</integer>
+				<key>queuemode</key>
+				<integer>1</integer>
+				<key>runningsubtext</key>
+				<string>…</string>
+				<key>script</key>
+				<string>osascript -l JavaScript ./devtoolbox.js smart "$1"</string>
+				<key>scriptargtype</key>
+				<integer>1</integer>
+				<key>scriptfile</key>
+				<string></string>
+				<key>skipuniversalaction</key>
+				<true/>
+				<key>subtext</key>
+				<string>Transform the clipboard or selection</string>
+				<key>title</key>
+				<string>DevToolbox</string>
+				<key>type</key>
+				<integer>0</integer>
+				<key>withspace</key>
+				<true/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.input.scriptfilter</string>
+			<key>uid</key>
+			<string>5624E2CE-31AD-5DB0-8D43-3DB11D3D0C8D</string>
+			<key>version</key>
+			<integer>3</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>alfredfiltersresults</key>
+				<false/>
+				<key>alfredfiltersresultsmatchmode</key>
+				<integer>0</integer>
+				<key>argumenttreatemptyqueryasnil</key>
+				<false/>
+				<key>argumenttrimmode</key>
+				<integer>0</integer>
+				<key>argumenttype</key>
+				<integer>1</integer>
+				<key>escaping</key>
+				<integer>102</integer>
+				<key>keyword</key>
+				<string>{var:keyword_json}</string>
+				<key>queuedelaycustom</key>
+				<integer>3</integer>
+				<key>queuedelayimmediatelyinitially</key>
+				<true/>
+				<key>queuedelaymode</key>
+				<integer>0</integer>
+				<key>queuemode</key>
+				<integer>1</integer>
+				<key>runningsubtext</key>
+				<string>…</string>
+				<key>script</key>
+				<string>osascript -l JavaScript ./devtoolbox.js json "$1"</string>
+				<key>scriptargtype</key>
+				<integer>1</integer>
+				<key>scriptfile</key>
+				<string></string>
+				<key>skipuniversalaction</key>
+				<true/>
+				<key>subtext</key>
+				<string>Format, minify, sort keys or generate TypeScript</string>
+				<key>title</key>
+				<string>JSON</string>
+				<key>type</key>
+				<integer>0</integer>
+				<key>withspace</key>
+				<true/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.input.scriptfilter</string>
+			<key>uid</key>
+			<string>B87C42D4-1C24-5A10-9E7B-D9BA21D529FC</string>
+			<key>version</key>
+			<integer>3</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>alfredfiltersresults</key>
+				<false/>
+				<key>alfredfiltersresultsmatchmode</key>
+				<integer>0</integer>
+				<key>argumenttreatemptyqueryasnil</key>
+				<false/>
+				<key>argumenttrimmode</key>
+				<integer>0</integer>
+				<key>argumenttype</key>
+				<integer>1</integer>
+				<key>escaping</key>
+				<integer>102</integer>
+				<key>keyword</key>
+				<string>{var:keyword_uuid}</string>
+				<key>queuedelaycustom</key>
+				<integer>3</integer>
+				<key>queuedelayimmediatelyinitially</key>
+				<true/>
+				<key>queuedelaymode</key>
+				<integer>0</integer>
+				<key>queuemode</key>
+				<integer>1</integer>
+				<key>runningsubtext</key>
+				<string>…</string>
+				<key>script</key>
+				<string>osascript -l JavaScript ./devtoolbox.js uuid "$1"</string>
+				<key>scriptargtype</key>
+				<integer>1</integer>
+				<key>scriptfile</key>
+				<string></string>
+				<key>skipuniversalaction</key>
+				<true/>
+				<key>subtext</key>
+				<string>UUID v4/v7, ULID, Nano ID</string>
+				<key>title</key>
+				<string>Generate IDs</string>
+				<key>type</key>
+				<integer>0</integer>
+				<key>withspace</key>
+				<true/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.input.scriptfilter</string>
+			<key>uid</key>
+			<string>A84CFB16-6CBC-5651-A7DE-65DB837CB975</string>
+			<key>version</key>
+			<integer>3</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>alfredfiltersresults</key>
+				<false/>
+				<key>alfredfiltersresultsmatchmode</key>
+				<integer>0</integer>
+				<key>argumenttreatemptyqueryasnil</key>
+				<false/>
+				<key>argumenttrimmode</key>
+				<integer>0</integer>
+				<key>argumenttype</key>
+				<integer>1</integer>
+				<key>escaping</key>
+				<integer>102</integer>
+				<key>keyword</key>
+				<string>{var:keyword_jwt}</string>
+				<key>queuedelaycustom</key>
+				<integer>3</integer>
+				<key>queuedelayimmediatelyinitially</key>
+				<true/>
+				<key>queuedelaymode</key>
+				<integer>0</integer>
+				<key>queuemode</key>
+				<integer>1</integer>
+				<key>runningsubtext</key>
+				<string>…</string>
+				<key>script</key>
+				<string>osascript -l JavaScript ./devtoolbox.js jwt "$1"</string>
+				<key>scriptargtype</key>
+				<integer>1</integer>
+				<key>scriptfile</key>
+				<string></string>
+				<key>skipuniversalaction</key>
+				<true/>
+				<key>subtext</key>
+				<string>From the clipboard or pasted token</string>
+				<key>title</key>
+				<string>Decode JWT</string>
+				<key>type</key>
+				<integer>0</integer>
+				<key>withspace</key>
+				<true/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.input.scriptfilter</string>
+			<key>uid</key>
+			<string>D98CF2C7-B248-5CCA-B029-9F64C25B09A3</string>
+			<key>version</key>
+			<integer>3</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>alfredfiltersresults</key>
+				<false/>
+				<key>alfredfiltersresultsmatchmode</key>
+				<integer>0</integer>
+				<key>argumenttreatemptyqueryasnil</key>
+				<false/>
+				<key>argumenttrimmode</key>
+				<integer>0</integer>
+				<key>argumenttype</key>
+				<integer>1</integer>
+				<key>escaping</key>
+				<integer>102</integer>
+				<key>keyword</key>
+				<string>{var:keyword_regex}</string>
+				<key>queuedelaycustom</key>
+				<integer>3</integer>
+				<key>queuedelayimmediatelyinitially</key>
+				<true/>
+				<key>queuedelaymode</key>
+				<integer>1</integer>
+				<key>queuemode</key>
+				<integer>1</integer>
+				<key>runningsubtext</key>
+				<string>…</string>
+				<key>script</key>
+				<string>osascript -l JavaScript ./devtoolbox.js regex "$1"</string>
+				<key>scriptargtype</key>
+				<integer>1</integer>
+				<key>scriptfile</key>
+				<string></string>
+				<key>skipuniversalaction</key>
+				<true/>
+				<key>subtext</key>
+				<string>Match a pattern against the clipboard</string>
+				<key>title</key>
+				<string>Test Regex</string>
+				<key>type</key>
+				<integer>0</integer>
+				<key>withspace</key>
+				<true/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.input.scriptfilter</string>
+			<key>uid</key>
+			<string>3FE5EAAA-1A96-53F4-A25E-A05ACCD05380</string>
+			<key>version</key>
+			<integer>3</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>alfredfiltersresults</key>
+				<false/>
+				<key>alfredfiltersresultsmatchmode</key>
+				<integer>0</integer>
+				<key>argumenttreatemptyqueryasnil</key>
+				<false/>
+				<key>argumenttrimmode</key>
+				<integer>0</integer>
+				<key>argumenttype</key>
+				<integer>1</integer>
+				<key>escaping</key>
+				<integer>102</integer>
+				<key>keyword</key>
+				<string>{var:keyword_hash}</string>
+				<key>queuedelaycustom</key>
+				<integer>3</integer>
+				<key>queuedelayimmediatelyinitially</key>
+				<true/>
+				<key>queuedelaymode</key>
+				<integer>0</integer>
+				<key>queuemode</key>
+				<integer>1</integer>
+				<key>runningsubtext</key>
+				<string>…</string>
+				<key>script</key>
+				<string>osascript -l JavaScript ./devtoolbox.js hash "$1"</string>
+				<key>scriptargtype</key>
+				<integer>1</integer>
+				<key>scriptfile</key>
+				<string></string>
+				<key>skipuniversalaction</key>
+				<true/>
+				<key>subtext</key>
+				<string>MD5, SHA-1, SHA-256, SHA-512, CRC32</string>
+				<key>title</key>
+				<string>Hash</string>
+				<key>type</key>
+				<integer>0</integer>
+				<key>withspace</key>
+				<true/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.input.scriptfilter</string>
+			<key>uid</key>
+			<string>5D0277E9-5497-5D57-A3BC-C0FD9AEA6336</string>
+			<key>version</key>
+			<integer>3</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>alfredfiltersresults</key>
+				<false/>
+				<key>alfredfiltersresultsmatchmode</key>
+				<integer>0</integer>
+				<key>argumenttreatemptyqueryasnil</key>
+				<false/>
+				<key>argumenttrimmode</key>
+				<integer>0</integer>
+				<key>argumenttype</key>
+				<integer>1</integer>
+				<key>escaping</key>
+				<integer>102</integer>
+				<key>keyword</key>
+				<string>{var:keyword_enc}</string>
+				<key>queuedelaycustom</key>
+				<integer>3</integer>
+				<key>queuedelayimmediatelyinitially</key>
+				<true/>
+				<key>queuedelaymode</key>
+				<integer>0</integer>
+				<key>queuemode</key>
+				<integer>1</integer>
+				<key>runningsubtext</key>
+				<string>…</string>
+				<key>script</key>
+				<string>osascript -l JavaScript ./devtoolbox.js enc "$1"</string>
+				<key>scriptargtype</key>
+				<integer>1</integer>
+				<key>scriptfile</key>
+				<string></string>
+				<key>skipuniversalaction</key>
+				<true/>
+				<key>subtext</key>
+				<string>Base64, URL, HTML, hex, Unicode</string>
+				<key>title</key>
+				<string>Encode / Decode</string>
+				<key>type</key>
+				<integer>0</integer>
+				<key>withspace</key>
+				<true/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.input.scriptfilter</string>
+			<key>uid</key>
+			<string>6BE110CC-4418-5A8A-A3F9-E611FC509CC5</string>
+			<key>version</key>
+			<integer>3</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>alfredfiltersresults</key>
+				<false/>
+				<key>alfredfiltersresultsmatchmode</key>
+				<integer>0</integer>
+				<key>argumenttreatemptyqueryasnil</key>
+				<false/>
+				<key>argumenttrimmode</key>
+				<integer>0</integer>
+				<key>argumenttype</key>
+				<integer>1</integer>
+				<key>escaping</key>
+				<integer>102</integer>
+				<key>keyword</key>
+				<string>{var:keyword_epoch}</string>
+				<key>queuedelaycustom</key>
+				<integer>3</integer>
+				<key>queuedelayimmediatelyinitially</key>
+				<true/>
+				<key>queuedelaymode</key>
+				<integer>0</integer>
+				<key>queuemode</key>
+				<integer>1</integer>
+				<key>runningsubtext</key>
+				<string>…</string>
+				<key>script</key>
+				<string>osascript -l JavaScript ./devtoolbox.js epoch "$1"</string>
+				<key>scriptargtype</key>
+				<integer>1</integer>
+				<key>scriptfile</key>
+				<string></string>
+				<key>skipuniversalaction</key>
+				<true/>
+				<key>subtext</key>
+				<string>Unix timestamps and dates</string>
+				<key>title</key>
+				<string>Epoch Converter</string>
+				<key>type</key>
+				<integer>0</integer>
+				<key>withspace</key>
+				<true/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.input.scriptfilter</string>
+			<key>uid</key>
+			<string>D655C771-7DB7-549C-852F-6D23C2AABF6E</string>
+			<key>version</key>
+			<integer>3</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>alfredfiltersresults</key>
+				<false/>
+				<key>alfredfiltersresultsmatchmode</key>
+				<integer>0</integer>
+				<key>argumenttreatemptyqueryasnil</key>
+				<false/>
+				<key>argumenttrimmode</key>
+				<integer>0</integer>
+				<key>argumenttype</key>
+				<integer>1</integer>
+				<key>escaping</key>
+				<integer>102</integer>
+				<key>keyword</key>
+				<string>{var:keyword_diff}</string>
+				<key>queuedelaycustom</key>
+				<integer>3</integer>
+				<key>queuedelayimmediatelyinitially</key>
+				<true/>
+				<key>queuedelaymode</key>
+				<integer>0</integer>
+				<key>queuemode</key>
+				<integer>1</integer>
+				<key>runningsubtext</key>
+				<string>…</string>
+				<key>script</key>
+				<string>osascript -l JavaScript ./devtoolbox.js diff "$1"</string>
+				<key>scriptargtype</key>
+				<integer>1</integer>
+				<key>scriptfile</key>
+				<string></string>
+				<key>skipuniversalaction</key>
+				<true/>
+				<key>subtext</key>
+				<string>Compare the last two clipboard entries</string>
+				<key>title</key>
+				<string>Diff</string>
+				<key>type</key>
+				<integer>0</integer>
+				<key>withspace</key>
+				<true/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.input.scriptfilter</string>
+			<key>uid</key>
+			<string>B415C09F-D8DA-5442-94F3-D6FF9D878B9C</string>
+			<key>version</key>
+			<integer>3</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>alfredfiltersresults</key>
+				<false/>
+				<key>alfredfiltersresultsmatchmode</key>
+				<integer>0</integer>
+				<key>argumenttreatemptyqueryasnil</key>
+				<false/>
+				<key>argumenttrimmode</key>
+				<integer>0</integer>
+				<key>argumenttype</key>
+				<integer>1</integer>
+				<key>escaping</key>
+				<integer>102</integer>
+				<key>keyword</key>
+				<string>{var:keyword_case}</string>
+				<key>queuedelaycustom</key>
+				<integer>3</integer>
+				<key>queuedelayimmediatelyinitially</key>
+				<true/>
+				<key>queuedelaymode</key>
+				<integer>0</integer>
+				<key>queuemode</key>
+				<integer>1</integer>
+				<key>runningsubtext</key>
+				<string>…</string>
+				<key>script</key>
+				<string>osascript -l JavaScript ./devtoolbox.js case "$1"</string>
+				<key>scriptargtype</key>
+				<integer>1</integer>
+				<key>scriptfile</key>
+				<string></string>
+				<key>skipuniversalaction</key>
+				<true/>
+				<key>subtext</key>
+				<string>camelCase, snake_case, kebab-case, Title Case…</string>
+				<key>title</key>
+				<string>Change Case</string>
+				<key>type</key>
+				<integer>0</integer>
+				<key>withspace</key>
+				<true/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.input.scriptfilter</string>
+			<key>uid</key>
+			<string>AF698C28-4147-5988-84EB-07868CAC00DC</string>
+			<key>version</key>
+			<integer>3</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>acceptsfiles</key>
+				<false/>
+				<key>acceptsmulti</key>
+				<integer>0</integer>
+				<key>acceptstext</key>
+				<true/>
+				<key>acceptsurls</key>
+				<false/>
+				<key>name</key>
+				<string>Transform with DevToolbox</string>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.trigger.universalaction</string>
+			<key>uid</key>
+			<string>3F6F42E9-5EAA-5AFE-AC86-CA66A9930092</string>
+			<key>version</key>
+			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>acceptsfiles</key>
+				<true/>
+				<key>acceptsmulti</key>
+				<integer>1</integer>
+				<key>acceptstext</key>
+				<false/>
+				<key>acceptsurls</key>
+				<false/>
+				<key>name</key>
+				<string>Diff with DevToolbox</string>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.trigger.universalaction</string>
+			<key>uid</key>
+			<string>DB303AD3-B3CE-5906-BA77-97BB95B8E207</string>
+			<key>version</key>
+			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>acceptsfiles</key>
+				<true/>
+				<key>acceptsmulti</key>
+				<integer>0</integer>
+				<key>acceptstext</key>
+				<false/>
+				<key>acceptsurls</key>
+				<false/>
+				<key>name</key>
+				<string>Hash with DevToolbox</string>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.trigger.universalaction</string>
+			<key>uid</key>
+			<string>71FD1C77-368F-5423-B05D-4F219DD853B4</string>
+			<key>version</key>
+			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>concurrently</key>
+				<false/>
+				<key>escaping</key>
+				<integer>102</integer>
+				<key>script</key>
+				<string>./resolve.sh "$1"</string>
+				<key>scriptargtype</key>
+				<integer>1</integer>
+				<key>scriptfile</key>
+				<string></string>
+				<key>type</key>
+				<integer>0</integer>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.action.script</string>
+			<key>uid</key>
+			<string>3E28DA7B-A607-5484-8DDB-365B69C6EE9B</string>
+			<key>version</key>
+			<integer>2</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>concurrently</key>
+				<false/>
+				<key>escaping</key>
+				<integer>102</integer>
+				<key>script</key>
+				<string>./resolve.sh "$1"</string>
+				<key>scriptargtype</key>
+				<integer>1</integer>
+				<key>scriptfile</key>
+				<string></string>
+				<key>type</key>
+				<integer>0</integer>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.action.script</string>
+			<key>uid</key>
+			<string>1A5132AB-60D0-56A2-9D0B-3F56841A3180</string>
+			<key>version</key>
+			<integer>2</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>autopaste</key>
+				<false/>
+				<key>clipboardtext</key>
+				<string>{query}</string>
+				<key>ignoredynamicplaceholders</key>
+				<true/>
+				<key>transient</key>
+				<false/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.output.clipboard</string>
+			<key>uid</key>
+			<string>9C8EA8E0-EFA1-5803-8BC9-B527F07AF094</string>
+			<key>version</key>
+			<integer>3</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>autopaste</key>
+				<true/>
+				<key>clipboardtext</key>
+				<string>{query}</string>
+				<key>ignoredynamicplaceholders</key>
+				<true/>
+				<key>transient</key>
+				<false/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.output.clipboard</string>
+			<key>uid</key>
+			<string>EC770113-FD73-5622-9C53-1B3026112785</string>
+			<key>version</key>
+			<integer>3</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>concurrently</key>
+				<false/>
+				<key>escaping</key>
+				<integer>102</integer>
+				<key>script</key>
+				<string>osascript -l JavaScript ./devtoolbox.js diff-action "$1"</string>
+				<key>scriptargtype</key>
+				<integer>1</integer>
+				<key>scriptfile</key>
+				<string></string>
+				<key>type</key>
+				<integer>0</integer>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.action.script</string>
+			<key>uid</key>
+			<string>E6A700E9-9332-507B-8CA1-DF280CE2E37E</string>
+			<key>version</key>
+			<integer>2</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>lastpathcomponent</key>
+				<false/>
+				<key>onlyshowifquerypopulated</key>
+				<true/>
+				<key>removeextension</key>
+				<false/>
+				<key>text</key>
+				<string>{query}</string>
+				<key>title</key>
+				<string>{var:alfred_workflow_name}</string>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.output.notification</string>
+			<key>uid</key>
+			<string>D5414F1F-0DC7-569F-A0AF-A57341905C4D</string>
+			<key>version</key>
+			<integer>1</integer>
+		</dict>
+	</array>
 	<key>readme</key>
-	<string># DevToolbox
+	<string>## Usage
 
-One workflow for everyday developer transforms: JSON, UUID, JWT, regex, hashes, encoding, timestamps, diff.
+Transform whatever is in the clipboard via the `dev` keyword. DevToolbox detects JSON, JWTs, timestamps and dates, and always offers encodings and hashes. Type text after the keyword to use it instead of the clipboard.
 
-&gt; **Status:** planned — not yet functional. See [PLAN.md](PLAN.md).
+Alternatively, transform selected text via the Universal Action.
 
-## Usage
+* &lt;kbd&gt;↩&lt;/kbd&gt; Copy the result.
+* &lt;kbd&gt;⌘&lt;/kbd&gt;&lt;kbd&gt;↩&lt;/kbd&gt; Paste the result into the frontmost app.
+* &lt;kbd&gt;⌘&lt;/kbd&gt;&lt;kbd&gt;C&lt;/kbd&gt; Copy the result without closing Alfred.
+* &lt;kbd&gt;⌘&lt;/kbd&gt;&lt;kbd&gt;L&lt;/kbd&gt; Show the result in Large Type.
 
-One workflow for everyday developer transforms: JSON, UUID, JWT, regex, hashes, encoding, timestamps, diff via the `json` keyword.
+The same keys work in every tool below.
 
-![DevToolbox results in Alfred](images/json.png)
+### JSON
 
-* &lt;kbd&gt;↩&lt;/kbd&gt; Primary action.
-* &lt;kbd&gt;⌘&lt;/kbd&gt;&lt;kbd&gt;↩&lt;/kbd&gt; Secondary action.
-* &lt;kbd&gt;⌘&lt;/kbd&gt;&lt;kbd&gt;Y&lt;/kbd&gt; Quick Look.
+Pretty print, minify, sort keys, generate TypeScript interfaces, or convert to JSON Lines or CSV via the `json` keyword. It also fixes JavaScript-style objects (unquoted keys, single quotes, trailing commas) and converts CSV to JSON. Type `min`, `sort` or `ts` to jump to an action, or paste JSON after the keyword.
+
+### IDs
+
+Generate a UUID v4, UUID v7, ULID or Nano ID via the `uuid` keyword. Start with a number to generate several, one per line, like `uuid 10 v7`.
+
+### JWT
+
+Decode a JSON Web Token from the clipboard via the `jwt` keyword: see whether it has expired, its header, payload and every claim, with dates in local time. The signature is not verified.
+
+### Regular Expressions
+
+Test a regular expression against the clipboard via the `regex` keyword. Write `/pattern/flags` to set flags, and add ` =&gt; replacement` to replace matches (`$1` and `$&lt;name&gt;` refer to groups).
+
+* &lt;kbd&gt;↩&lt;/kbd&gt; on the summary row copies every match, one per line.
+
+### Case
+
+Convert text to camelCase, PascalCase, snake_case, CONSTANT_CASE, kebab-case, Title Case, Sentence case and more via the `case` keyword.
+
+### Hashes
+
+Get the MD5, SHA-1, SHA-256, SHA-512 and CRC32 of the clipboard or typed text via the `hash` keyword.
+
+Alternatively, hash a file via the Universal Action. Copy the checksum from a download page first to see whether the file matches.
+
+### Encoding
+
+Encode or decode Base64, Base64URL, URL encoding, HTML entities, hex, backslash escapes and Unicode escapes via the `enc` keyword. Decoding options appear when the text is encoded, and numbers are converted between decimal, hex, binary and octal.
+
+### Timestamps
+
+Convert Unix timestamps (seconds, milliseconds, microseconds or nanoseconds) and dates via the `epoch` keyword. Leave it empty for the current time.
+
+### Diff
+
+Compare the last two text entries of Alfred’s Clipboard History via the `diff` keyword. JSON is compared with its keys sorted, so only real changes show.
+
+Alternatively, compare two selected files via the Universal Action.
+
+* &lt;kbd&gt;↩&lt;/kbd&gt; Open the unified diff.
+* &lt;kbd&gt;⌘&lt;/kbd&gt;&lt;kbd&gt;↩&lt;/kbd&gt; Copy the unified diff.
+* &lt;kbd&gt;⌥&lt;/kbd&gt;&lt;kbd&gt;↩&lt;/kbd&gt; Compare side by side in the app set in the Workflow’s Configuration.
 
 Every keyword can be changed in the Workflow’s Configuration.
-
-## Development
-
-```bash
-./build.sh   # -&gt; dist/alfred-devtoolbox-&lt;version&gt;.alfredworkflow
-```
-
-## AI disclosure
-
-This workflow is developed with the help of Claude (Anthropic), an AI assistant. All code is reviewed and tested by the author.
 </string>
 	<key>uidata</key>
-	<dict/>
+	<dict>
+		<key>1A5132AB-60D0-56A2-9D0B-3F56841A3180</key>
+		<dict>
+			<key>xpos</key>
+			<integer>470</integer>
+			<key>ypos</key>
+			<integer>150</integer>
+		</dict>
+		<key>3E28DA7B-A607-5484-8DDB-365B69C6EE9B</key>
+		<dict>
+			<key>note</key>
+			<string>Reads large results back from the cache</string>
+			<key>xpos</key>
+			<integer>470</integer>
+			<key>ypos</key>
+			<integer>20</integer>
+		</dict>
+		<key>3F6F42E9-5EAA-5AFE-AC86-CA66A9930092</key>
+		<dict>
+			<key>xpos</key>
+			<integer>30</integer>
+			<key>ypos</key>
+			<integer>930</integer>
+		</dict>
+		<key>3FE5EAAA-1A96-53F4-A25E-A05ACCD05380</key>
+		<dict>
+			<key>xpos</key>
+			<integer>30</integer>
+			<key>ypos</key>
+			<integer>410</integer>
+		</dict>
+		<key>5624E2CE-31AD-5DB0-8D43-3DB11D3D0C8D</key>
+		<dict>
+			<key>xpos</key>
+			<integer>250</integer>
+			<key>ypos</key>
+			<integer>20</integer>
+		</dict>
+		<key>5D0277E9-5497-5D57-A3BC-C0FD9AEA6336</key>
+		<dict>
+			<key>xpos</key>
+			<integer>250</integer>
+			<key>ypos</key>
+			<integer>150</integer>
+		</dict>
+		<key>6BE110CC-4418-5A8A-A3F9-E611FC509CC5</key>
+		<dict>
+			<key>xpos</key>
+			<integer>30</integer>
+			<key>ypos</key>
+			<integer>540</integer>
+		</dict>
+		<key>71FD1C77-368F-5423-B05D-4F219DD853B4</key>
+		<dict>
+			<key>xpos</key>
+			<integer>30</integer>
+			<key>ypos</key>
+			<integer>1190</integer>
+		</dict>
+		<key>9C8EA8E0-EFA1-5803-8BC9-B527F07AF094</key>
+		<dict>
+			<key>xpos</key>
+			<integer>690</integer>
+			<key>ypos</key>
+			<integer>20</integer>
+		</dict>
+		<key>A84CFB16-6CBC-5651-A7DE-65DB837CB975</key>
+		<dict>
+			<key>xpos</key>
+			<integer>30</integer>
+			<key>ypos</key>
+			<integer>150</integer>
+		</dict>
+		<key>AF698C28-4147-5988-84EB-07868CAC00DC</key>
+		<dict>
+			<key>xpos</key>
+			<integer>30</integer>
+			<key>ypos</key>
+			<integer>800</integer>
+		</dict>
+		<key>B415C09F-D8DA-5442-94F3-D6FF9D878B9C</key>
+		<dict>
+			<key>xpos</key>
+			<integer>250</integer>
+			<key>ypos</key>
+			<integer>280</integer>
+		</dict>
+		<key>B87C42D4-1C24-5A10-9E7B-D9BA21D529FC</key>
+		<dict>
+			<key>xpos</key>
+			<integer>30</integer>
+			<key>ypos</key>
+			<integer>20</integer>
+		</dict>
+		<key>D5414F1F-0DC7-569F-A0AF-A57341905C4D</key>
+		<dict>
+			<key>xpos</key>
+			<integer>690</integer>
+			<key>ypos</key>
+			<integer>280</integer>
+		</dict>
+		<key>D655C771-7DB7-549C-852F-6D23C2AABF6E</key>
+		<dict>
+			<key>xpos</key>
+			<integer>30</integer>
+			<key>ypos</key>
+			<integer>670</integer>
+		</dict>
+		<key>D98CF2C7-B248-5CCA-B029-9F64C25B09A3</key>
+		<dict>
+			<key>xpos</key>
+			<integer>30</integer>
+			<key>ypos</key>
+			<integer>280</integer>
+		</dict>
+		<key>DB303AD3-B3CE-5906-BA77-97BB95B8E207</key>
+		<dict>
+			<key>xpos</key>
+			<integer>30</integer>
+			<key>ypos</key>
+			<integer>1060</integer>
+		</dict>
+		<key>E6A700E9-9332-507B-8CA1-DF280CE2E37E</key>
+		<dict>
+			<key>xpos</key>
+			<integer>470</integer>
+			<key>ypos</key>
+			<integer>280</integer>
+		</dict>
+		<key>EC770113-FD73-5622-9C53-1B3026112785</key>
+		<dict>
+			<key>xpos</key>
+			<integer>690</integer>
+			<key>ypos</key>
+			<integer>150</integer>
+		</dict>
+	</dict>
 	<key>userconfigurationconfig</key>
 	<array>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>default</key>
+				<string>dev</string>
+				<key>placeholder</key>
+				<string>dev</string>
+				<key>required</key>
+				<true/>
+				<key>trim</key>
+				<true/>
+			</dict>
+			<key>description</key>
+			<string>Smart hub: detects what the clipboard or selection contains</string>
+			<key>label</key>
+			<string>Keywords</string>
+			<key>type</key>
+			<string>textfield</string>
+			<key>variable</key>
+			<string>keyword_dev</string>
+		</dict>
 		<dict>
 			<key>config</key>
 			<dict>
@@ -62,9 +1275,9 @@ This workflow is developed with the help of Claude (Anthropic), an AI assistant.
 				<true/>
 			</dict>
 			<key>description</key>
-			<string></string>
+			<string>JSON</string>
 			<key>label</key>
-			<string>Json keyword</string>
+			<string></string>
 			<key>type</key>
 			<string>textfield</string>
 			<key>variable</key>
@@ -83,7 +1296,7 @@ This workflow is developed with the help of Claude (Anthropic), an AI assistant.
 				<true/>
 			</dict>
 			<key>description</key>
-			<string></string>
+			<string>UUID and IDs</string>
 			<key>label</key>
 			<string></string>
 			<key>type</key>
@@ -104,7 +1317,7 @@ This workflow is developed with the help of Claude (Anthropic), an AI assistant.
 				<true/>
 			</dict>
 			<key>description</key>
-			<string></string>
+			<string>JWT decoder</string>
 			<key>label</key>
 			<string></string>
 			<key>type</key>
@@ -125,7 +1338,7 @@ This workflow is developed with the help of Claude (Anthropic), an AI assistant.
 				<true/>
 			</dict>
 			<key>description</key>
-			<string></string>
+			<string>Regex tester</string>
 			<key>label</key>
 			<string></string>
 			<key>type</key>
@@ -146,7 +1359,7 @@ This workflow is developed with the help of Claude (Anthropic), an AI assistant.
 				<true/>
 			</dict>
 			<key>description</key>
-			<string></string>
+			<string>Hashes</string>
 			<key>label</key>
 			<string></string>
 			<key>type</key>
@@ -167,7 +1380,7 @@ This workflow is developed with the help of Claude (Anthropic), an AI assistant.
 				<true/>
 			</dict>
 			<key>description</key>
-			<string></string>
+			<string>Encode and decode</string>
 			<key>label</key>
 			<string></string>
 			<key>type</key>
@@ -188,7 +1401,7 @@ This workflow is developed with the help of Claude (Anthropic), an AI assistant.
 				<true/>
 			</dict>
 			<key>description</key>
-			<string></string>
+			<string>Timestamps</string>
 			<key>label</key>
 			<string></string>
 			<key>type</key>
@@ -209,7 +1422,7 @@ This workflow is developed with the help of Claude (Anthropic), an AI assistant.
 				<true/>
 			</dict>
 			<key>description</key>
-			<string></string>
+			<string>Diff</string>
 			<key>label</key>
 			<string></string>
 			<key>type</key>
@@ -217,9 +1430,117 @@ This workflow is developed with the help of Claude (Anthropic), an AI assistant.
 			<key>variable</key>
 			<string>keyword_diff</string>
 		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>default</key>
+				<string>case</string>
+				<key>placeholder</key>
+				<string>case</string>
+				<key>required</key>
+				<true/>
+				<key>trim</key>
+				<true/>
+			</dict>
+			<key>description</key>
+			<string>Change case</string>
+			<key>label</key>
+			<string></string>
+			<key>type</key>
+			<string>textfield</string>
+			<key>variable</key>
+			<string>keyword_case</string>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>default</key>
+				<string>2</string>
+				<key>pairs</key>
+				<array>
+					<array>
+						<string>2 spaces</string>
+						<string>2</string>
+					</array>
+					<array>
+						<string>4 spaces</string>
+						<string>4</string>
+					</array>
+					<array>
+						<string>Tab</string>
+						<string>tab</string>
+					</array>
+				</array>
+			</dict>
+			<key>description</key>
+			<string></string>
+			<key>label</key>
+			<string>JSON indent</string>
+			<key>type</key>
+			<string>popupbutton</string>
+			<key>variable</key>
+			<string>json_indent</string>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>default</key>
+				<false/>
+				<key>required</key>
+				<false/>
+				<key>text</key>
+				<string>Show hashes in uppercase</string>
+			</dict>
+			<key>description</key>
+			<string></string>
+			<key>label</key>
+			<string>Hashes</string>
+			<key>type</key>
+			<string>checkbox</string>
+			<key>variable</key>
+			<string>hash_uppercase</string>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>default</key>
+				<string>filemerge</string>
+				<key>pairs</key>
+				<array>
+					<array>
+						<string>FileMerge (Xcode)</string>
+						<string>filemerge</string>
+					</array>
+					<array>
+						<string>Visual Studio Code</string>
+						<string>vscode</string>
+					</array>
+					<array>
+						<string>Kaleidoscope</string>
+						<string>kaleidoscope</string>
+					</array>
+					<array>
+						<string>BBEdit</string>
+						<string>bbedit</string>
+					</array>
+				</array>
+			</dict>
+			<key>description</key>
+			<string>Used to compare side by side. Its command-line tool must be installed.</string>
+			<key>label</key>
+			<string>Diff app (⌥↩)</string>
+			<key>type</key>
+			<string>popupbutton</string>
+			<key>variable</key>
+			<string>diff_app</string>
+		</dict>
 	</array>
+	<key>variables</key>
+	<dict/>
+	<key>variablesdontexport</key>
+	<array/>
 	<key>version</key>
-	<string>0.1.0</string>
+	<string>1.0.0</string>
 	<key>webaddress</key>
 	<string>https://github.com/x-o-r-r-o/alfred-devtoolbox</string>
 </dict>

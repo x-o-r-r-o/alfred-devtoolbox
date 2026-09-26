@@ -1,0 +1,447 @@
+{
+  "bundleid": "io.github.x-o-r-r-o.devtoolbox",
+  "name": "DevToolbox",
+  "description": "Format JSON, generate UUIDs, decode JWTs, test regex, change case, hash, encode, convert timestamps and diff text",
+  "category": "Tools",
+  "createdby": "x-o-r-r-o",
+  "webaddress": "https://github.com/x-o-r-r-o/alfred-devtoolbox",
+  "version": "1.0.0",
+  "variablesdontexport": [],
+  "config": [
+    {
+      "type": "textfield",
+      "variable": "keyword_dev",
+      "label": "Keywords",
+      "description": "Smart hub: detects what the clipboard or selection contains",
+      "config": {
+        "default": "dev",
+        "placeholder": "dev",
+        "required": true,
+        "trim": true
+      }
+    },
+    {
+      "type": "textfield",
+      "variable": "keyword_json",
+      "label": "",
+      "description": "JSON",
+      "config": {
+        "default": "json",
+        "placeholder": "json",
+        "required": true,
+        "trim": true
+      }
+    },
+    {
+      "type": "textfield",
+      "variable": "keyword_uuid",
+      "label": "",
+      "description": "UUID and IDs",
+      "config": {
+        "default": "uuid",
+        "placeholder": "uuid",
+        "required": true,
+        "trim": true
+      }
+    },
+    {
+      "type": "textfield",
+      "variable": "keyword_jwt",
+      "label": "",
+      "description": "JWT decoder",
+      "config": {
+        "default": "jwt",
+        "placeholder": "jwt",
+        "required": true,
+        "trim": true
+      }
+    },
+    {
+      "type": "textfield",
+      "variable": "keyword_regex",
+      "label": "",
+      "description": "Regex tester",
+      "config": {
+        "default": "regex",
+        "placeholder": "regex",
+        "required": true,
+        "trim": true
+      }
+    },
+    {
+      "type": "textfield",
+      "variable": "keyword_hash",
+      "label": "",
+      "description": "Hashes",
+      "config": {
+        "default": "hash",
+        "placeholder": "hash",
+        "required": true,
+        "trim": true
+      }
+    },
+    {
+      "type": "textfield",
+      "variable": "keyword_enc",
+      "label": "",
+      "description": "Encode and decode",
+      "config": {
+        "default": "enc",
+        "placeholder": "enc",
+        "required": true,
+        "trim": true
+      }
+    },
+    {
+      "type": "textfield",
+      "variable": "keyword_epoch",
+      "label": "",
+      "description": "Timestamps",
+      "config": {
+        "default": "epoch",
+        "placeholder": "epoch",
+        "required": true,
+        "trim": true
+      }
+    },
+    {
+      "type": "textfield",
+      "variable": "keyword_diff",
+      "label": "",
+      "description": "Diff",
+      "config": {
+        "default": "diff",
+        "placeholder": "diff",
+        "required": true,
+        "trim": true
+      }
+    },
+    {
+      "type": "textfield",
+      "variable": "keyword_case",
+      "label": "",
+      "description": "Change case",
+      "config": {
+        "default": "case",
+        "placeholder": "case",
+        "required": true,
+        "trim": true
+      }
+    },
+    {
+      "type": "popupbutton",
+      "variable": "json_indent",
+      "label": "JSON indent",
+      "description": "",
+      "config": {
+        "default": "2",
+        "pairs": [
+          [
+            "2 spaces",
+            "2"
+          ],
+          [
+            "4 spaces",
+            "4"
+          ],
+          [
+            "Tab",
+            "tab"
+          ]
+        ]
+      }
+    },
+    {
+      "type": "checkbox",
+      "variable": "hash_uppercase",
+      "label": "Hashes",
+      "description": "",
+      "config": {
+        "default": false,
+        "required": false,
+        "text": "Show hashes in uppercase"
+      }
+    },
+    {
+      "type": "popupbutton",
+      "variable": "diff_app",
+      "label": "Diff app (⌥↩)",
+      "description": "Used to compare side by side. Its command-line tool must be installed.",
+      "config": {
+        "default": "filemerge",
+        "pairs": [
+          [
+            "FileMerge (Xcode)",
+            "filemerge"
+          ],
+          [
+            "Visual Studio Code",
+            "vscode"
+          ],
+          [
+            "Kaleidoscope",
+            "kaleidoscope"
+          ],
+          [
+            "BBEdit",
+            "bbedit"
+          ]
+        ]
+      }
+    }
+  ],
+  "objects": [
+    {
+      "id": "sf_dev",
+      "type": "scriptfilter",
+      "keyword": "{var:keyword_dev}",
+      "title": "DevToolbox",
+      "subtext": "Transform the clipboard or selection",
+      "script": "osascript -l JavaScript ./devtoolbox.js smart \"$1\""
+    },
+    {
+      "id": "sf_json",
+      "type": "scriptfilter",
+      "keyword": "{var:keyword_json}",
+      "title": "JSON",
+      "subtext": "Format, minify, sort keys or generate TypeScript",
+      "script": "osascript -l JavaScript ./devtoolbox.js json \"$1\""
+    },
+    {
+      "id": "sf_uuid",
+      "type": "scriptfilter",
+      "keyword": "{var:keyword_uuid}",
+      "title": "Generate IDs",
+      "subtext": "UUID v4/v7, ULID, Nano ID",
+      "script": "osascript -l JavaScript ./devtoolbox.js uuid \"$1\""
+    },
+    {
+      "id": "sf_jwt",
+      "type": "scriptfilter",
+      "keyword": "{var:keyword_jwt}",
+      "title": "Decode JWT",
+      "subtext": "From the clipboard or pasted token",
+      "script": "osascript -l JavaScript ./devtoolbox.js jwt \"$1\""
+    },
+    {
+      "id": "sf_regex",
+      "type": "scriptfilter",
+      "keyword": "{var:keyword_regex}",
+      "title": "Test Regex",
+      "subtext": "Match a pattern against the clipboard",
+      "script": "osascript -l JavaScript ./devtoolbox.js regex \"$1\"",
+      "queuedelaymode": 1
+    },
+    {
+      "id": "sf_hash",
+      "type": "scriptfilter",
+      "keyword": "{var:keyword_hash}",
+      "title": "Hash",
+      "subtext": "MD5, SHA-1, SHA-256, SHA-512, CRC32",
+      "script": "osascript -l JavaScript ./devtoolbox.js hash \"$1\""
+    },
+    {
+      "id": "sf_enc",
+      "type": "scriptfilter",
+      "keyword": "{var:keyword_enc}",
+      "title": "Encode / Decode",
+      "subtext": "Base64, URL, HTML, hex, Unicode",
+      "script": "osascript -l JavaScript ./devtoolbox.js enc \"$1\""
+    },
+    {
+      "id": "sf_epoch",
+      "type": "scriptfilter",
+      "keyword": "{var:keyword_epoch}",
+      "title": "Epoch Converter",
+      "subtext": "Unix timestamps and dates",
+      "script": "osascript -l JavaScript ./devtoolbox.js epoch \"$1\""
+    },
+    {
+      "id": "sf_diff",
+      "type": "scriptfilter",
+      "keyword": "{var:keyword_diff}",
+      "title": "Diff",
+      "subtext": "Compare the last two clipboard entries",
+      "script": "osascript -l JavaScript ./devtoolbox.js diff \"$1\""
+    },
+    {
+      "id": "sf_case",
+      "type": "scriptfilter",
+      "keyword": "{var:keyword_case}",
+      "title": "Change Case",
+      "subtext": "camelCase, snake_case, kebab-case, Title Case…",
+      "script": "osascript -l JavaScript ./devtoolbox.js case \"$1\""
+    },
+    {
+      "id": "ua_text",
+      "type": "universalaction",
+      "name": "Transform with DevToolbox",
+      "text": true
+    },
+    {
+      "id": "ua_files",
+      "type": "universalaction",
+      "name": "Diff with DevToolbox",
+      "files": true,
+      "multi": 1
+    },
+    {
+      "id": "ua_hash",
+      "type": "universalaction",
+      "name": "Hash with DevToolbox",
+      "files": true,
+      "multi": 0
+    },
+    {
+      "id": "resolve",
+      "type": "script",
+      "script": "./resolve.sh \"$1\"",
+      "note": "Reads large results back from the cache"
+    },
+    {
+      "id": "resolve_paste",
+      "type": "script",
+      "script": "./resolve.sh \"$1\""
+    },
+    {
+      "id": "copy",
+      "type": "clipboard",
+      "autopaste": false
+    },
+    {
+      "id": "paste",
+      "type": "clipboard",
+      "autopaste": true
+    },
+    {
+      "id": "diff_run",
+      "type": "script",
+      "script": "osascript -l JavaScript ./devtoolbox.js diff-action \"$1\""
+    },
+    {
+      "id": "notify",
+      "type": "notification"
+    }
+  ],
+  "connections": [
+    {
+      "from": "ua_text",
+      "to": "sf_dev"
+    },
+    {
+      "from": "ua_files",
+      "to": "sf_diff"
+    },
+    {
+      "from": "ua_hash",
+      "to": "sf_hash"
+    },
+    {
+      "from": "sf_dev",
+      "to": "resolve"
+    },
+    {
+      "from": "sf_dev",
+      "to": "resolve_paste",
+      "mod": "cmd"
+    },
+    {
+      "from": "sf_json",
+      "to": "resolve"
+    },
+    {
+      "from": "sf_json",
+      "to": "resolve_paste",
+      "mod": "cmd"
+    },
+    {
+      "from": "sf_uuid",
+      "to": "resolve"
+    },
+    {
+      "from": "sf_uuid",
+      "to": "resolve_paste",
+      "mod": "cmd"
+    },
+    {
+      "from": "sf_jwt",
+      "to": "resolve"
+    },
+    {
+      "from": "sf_jwt",
+      "to": "resolve_paste",
+      "mod": "cmd"
+    },
+    {
+      "from": "sf_regex",
+      "to": "resolve"
+    },
+    {
+      "from": "sf_regex",
+      "to": "resolve_paste",
+      "mod": "cmd"
+    },
+    {
+      "from": "sf_hash",
+      "to": "resolve"
+    },
+    {
+      "from": "sf_hash",
+      "to": "resolve_paste",
+      "mod": "cmd"
+    },
+    {
+      "from": "sf_enc",
+      "to": "resolve"
+    },
+    {
+      "from": "sf_enc",
+      "to": "resolve_paste",
+      "mod": "cmd"
+    },
+    {
+      "from": "sf_epoch",
+      "to": "resolve"
+    },
+    {
+      "from": "sf_epoch",
+      "to": "resolve_paste",
+      "mod": "cmd"
+    },
+    {
+      "from": "sf_diff",
+      "to": "diff_run"
+    },
+    {
+      "from": "sf_diff",
+      "to": "diff_run",
+      "mod": "cmd"
+    },
+    {
+      "from": "sf_diff",
+      "to": "diff_run",
+      "mod": "alt"
+    },
+    {
+      "from": "diff_run",
+      "to": "notify"
+    },
+    {
+      "from": "sf_case",
+      "to": "resolve"
+    },
+    {
+      "from": "sf_case",
+      "to": "resolve_paste",
+      "mod": "cmd"
+    },
+    {
+      "from": "resolve",
+      "to": "copy"
+    },
+    {
+      "from": "resolve_paste",
+      "to": "paste"
+    }
+  ]
+}
