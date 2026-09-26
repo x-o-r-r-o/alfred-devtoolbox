@@ -452,7 +452,7 @@ class RegressionTests(unittest.TestCase):
     def test_jwt_out_of_range_dates(self):
         it = sf("jwt", clipboard=f"{b64url({'alg': 'HS256'})}.{b64url({'exp': 1e20, 'iat': -1e20})}.x")
         self.assertNotEqual(it[0]["title"], "DevToolbox error")
-        self.assertEqual(find(it, "Expires (exp)")["arg"], "100000000000000000000")
+        self.assertEqual(find(it, "Expires (exp)")["arg"], "1e+20")  # kept exactly as written in the token
 
     def test_jwt_not_yet_valid(self):
         import time
@@ -630,6 +630,55 @@ class SecondPassTests(unittest.TestCase):
         out = subprocess.run(["osascript", "-l", "JavaScript", "./devtoolbox.js", "json", ""], cwd=SRC, env=e, capture_output=True, text=True)
         self.assertLess(time.time() - t, 3)
         self.assertTrue(json.loads(out.stdout)["items"][0]["title"].startswith("Valid JSON · 20000 items"))
+
+
+class FinalReviewTests(unittest.TestCase):
+    """Bugs found in the final release review."""
+
+    def test_prototype_names_are_not_tools_or_entities(self):
+        for q in ("constructor", "constructor foo", "__proto__ x", "toString"):
+            it = sf("smart", q, clipboard="hello")
+            self.assertNotEqual(it[0]["title"], "DevToolbox error", q)
+        it = sf("enc", "a &constructor; b")
+        self.assertFalse(any("native code" in i["title"] for i in it))
+
+    def test_jwt_prototype_alg_and_claims(self):
+        tok = f"{b64url({'alg': 'constructor'})}.{b64url({'constructor': 1, '__proto__': 2})}.x"
+        it = sf("jwt", tok)
+        titles = [i["title"] for i in it]
+        self.assertIn("constructor: 1", titles)
+        self.assertIn("__proto__: 2", titles)
+        it = sf("jwt", tok + " secret")
+        self.assertTrue(any(t["title"].startswith("Can't verify") for t in it))
+
+    def test_jwt_payload_keeps_big_numbers(self):
+        tok = f"{b64url({'alg': 'HS256'})}.{b64url(b'{\"id\":12345678901234567890}')}.x"
+        it = sf("jwt", tok)
+        self.assertIn("12345678901234567890", find(it, "Payload")["arg"])
+        self.assertEqual(find(it, "id:")["arg"], "12345678901234567890")
+
+    def test_csv_missing_prototype_key(self):
+        it = sf("json", "csv", clipboard='[{"a":1},{"constructor":2}]')
+        self.assertEqual(it[0]["arg"], "a,constructor\n1,\n,2")
+
+    def test_titles_drop_bidi_and_control_chars(self):
+        it = sf("case", clipboard="x\u202egnp.exe\x07")
+        for i in it:
+            self.assertNotRegex(i["title"] + i.get("subtitle", ""), "[\u202a-\u202e\u2066-\u2069\x00-\x1f]")
+        self.assertIn("\u202e", find(it, "x").get("arg", "") + "".join(args(it)))
+
+    def test_truncation_does_not_split_emoji(self):
+        it = sf("case", clipboard="\U0001F600" * 100)
+        self.assertNotIn("\ufffd", "".join(i["title"] for i in it))
+
+    def test_diff_copies_do_not_pile_up(self):
+        for n in range(3):
+            d = tempfile.mkdtemp()
+            a, b = os.path.join(d, f"x{n}"), os.path.join(d, f"y{n}")
+            write(a, "1\n")
+            write(b, "2\n")
+            sf("diff", f"{a}\t{b}")
+        self.assertEqual(sorted(os.listdir(os.path.join(CACHE, "diff"))), ["x2.a.txt", "y2.b.txt"])
 
 
 if __name__ == "__main__":

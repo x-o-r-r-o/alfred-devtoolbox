@@ -4,7 +4,7 @@ Everyday developer transforms in Alfred: format JSON, generate UUIDs, decode JWT
 
 ## Usage
 
-Transform whatever is in the clipboard via the `dev` keyword. DevToolbox detects JSON, JWTs, timestamps and dates, and always offers encodings and hashes. Type text after the keyword to use it instead of the clipboard.
+Transform whatever is in the clipboard via the `dev` keyword. DevToolbox detects JSON, JWTs, timestamps and dates, and always offers encodings and hashes. Type text after the keyword to use it instead of the clipboard, or type a tool’s name, like `dev json`, to jump to it.
 
 ![DevToolbox detecting a JWT in the clipboard](images/dev.png)
 
@@ -17,7 +17,7 @@ Alternatively, transform selected text via the Universal Action.
 * <kbd>⌘</kbd><kbd>C</kbd> Copy the result without closing Alfred.
 * <kbd>⌘</kbd><kbd>L</kbd> Show the result in Large Type.
 
-The same keys work in every tool below.
+The same keys work in every tool below, except Diff.
 
 ### JSON
 

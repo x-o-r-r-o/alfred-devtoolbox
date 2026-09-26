@@ -1042,7 +1042,7 @@
 	<key>readme</key>
 	<string>## Usage
 
-Transform whatever is in the clipboard via the `dev` keyword. DevToolbox detects JSON, JWTs, timestamps and dates, and always offers encodings and hashes. Type text after the keyword to use it instead of the clipboard.
+Transform whatever is in the clipboard via the `dev` keyword. DevToolbox detects JSON, JWTs, timestamps and dates, and always offers encodings and hashes. Type text after the keyword to use it instead of the clipboard, or type a tool’s name, like `dev json`, to jump to it.
 
 Alternatively, transform selected text via the Universal Action.
 
@@ -1051,7 +1051,7 @@ Alternatively, transform selected text via the Universal Action.
 * &lt;kbd&gt;⌘&lt;/kbd&gt;&lt;kbd&gt;C&lt;/kbd&gt; Copy the result without closing Alfred.
 * &lt;kbd&gt;⌘&lt;/kbd&gt;&lt;kbd&gt;L&lt;/kbd&gt; Show the result in Large Type.
 
-The same keys work in every tool below.
+The same keys work in every tool below, except Diff.
 
 ### JSON
 

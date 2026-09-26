@@ -10,9 +10,13 @@ function env(name, fallback) {
   return v.isNil() ? fallback : v.js;
 }
 
+// Own-property lookup: user-controlled keys ("constructor", "__proto__") must never hit Object.prototype
+const own = (o, k) => Object.prototype.hasOwnProperty.call(o, k);
+const lookup = (o, k) => (own(o, k) ? o[k] : undefined);
+
 const MAX_TEXT = 2 * 1024 * 1024; // ignore clipboards larger than 2 MB
 const MAX_MATCHES = 50;
-const INDENT = { "2": 2, "4": 4, tab: "\t" }[env("json_indent", "2")] || 2;
+const INDENT = lookup({ "2": 2, "4": 4, tab: "\t" }, env("json_indent", "2")) || 2;
 const HASH_UPPER = env("hash_uppercase", "0") === "1";
 
 // ---------- helpers ----------
@@ -55,7 +59,15 @@ function inputOrClipboard(query) {
 
 function oneLine(s, max = 120) {
   const t = String(s).replace(/\s+/g, " ").trim();
-  return t.length > max ? t.slice(0, max - 1) + "…" : t;
+  if (t.length <= max) return t;
+  let end = max - 1;
+  if (/[\ud800-\udbff]/.test(t[end - 1])) end--; // don't split an emoji's surrogate pair
+  return t.slice(0, end) + "…";
+}
+
+// Display strings only: control characters and bidi overrides (which can disguise text, e.g. "exe.gnp") are removed
+function displayText(s) {
+  return s.replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/g, "").replace(/[\t\n\r]/g, " ").replace(/[\u202a-\u202e\u2066-\u2069]/g, "");
 }
 
 function plural(n, word) {
@@ -98,7 +110,9 @@ function info(title, subtitle, icon = "info") {
 }
 
 function output(items, extra = {}) {
-  return JSON.stringify(Object.assign({ skipknowledge: true, items }, extra), (k, v) => (typeof v === "string" ? wellFormed(v) : v));
+  return JSON.stringify(Object.assign({ skipknowledge: true, items }, extra), (k, v) =>
+    typeof v !== "string" ? v : k === "title" || k === "subtitle" ? wellFormed(displayText(v)) : wellFormed(v)
+  );
 }
 
 // UTF-8 <-> "byte string" (each char 0–255)
@@ -360,7 +374,7 @@ function csvCell(v) {
 function toCSV(arr) {
   const cols = [], seen = new Set();
   for (const o of arr) for (const k of Object.keys(o)) if (!seen.has(k)) { seen.add(k); cols.push(k); }
-  return [cols.map(csvCell).join(","), ...arr.map((o) => cols.map((c) => csvCell(o[c])).join(","))].join("\n");
+  return [cols.map(csvCell).join(","), ...arr.map((o) => cols.map((c) => csvCell(lookup(o, c))).join(","))].join("\n");
 }
 
 function parseCSV(text) {
@@ -783,12 +797,12 @@ function jwtItems(query) {
     items.push(info("⚠ Unsigned token (alg: none)", "Anyone can forge this token; never accept it server-side", "error"));
     sigNote = "Unsigned";
   } else if (secret) {
-    if (HMAC[alg]) {
+    if (own(HMAC, alg)) {
       const ok = hmacB64url(alg, secret, `${h}.${p}`) === sig;
       items.push(info(ok ? `✓ Signature verified (${alg})` : `✗ Invalid signature (${alg})`, ok ? "The secret matches" : "The secret doesn't match, or the token was changed", ok ? "ok" : "error"));
       sigNote = ok ? "Signature verified" : "Invalid signature";
     } else items.push(info(`Can't verify ${alg || "this"} signatures`, "Only HS256, HS384 and HS512 secrets can be checked here", "info"));
-  } else if (HMAC[alg]) sigNote = "Signature not verified · type the secret after the keyword to check it";
+  } else if (own(HMAC, alg)) sigNote = "Signature not verified · type the secret after the keyword to check it";
   // Validity
   if (claims && typeof claims.nbf === "number" && validDate(claims.nbf * 1000) && claims.nbf * 1000 > now)
     items.unshift(info(`Not valid yet · starts ${relTime(claims.nbf * 1000)}`, `${localString(new Date(claims.nbf * 1000))} · ${sigNote}`, "error"));
@@ -796,22 +810,24 @@ function jwtItems(query) {
     const exp = claims.exp * 1000;
     items.unshift(info(exp > now ? `Valid · expires ${relTime(exp)}` : `Expired ${relTime(exp)}`, `${localString(new Date(exp))} · ${sigNote}`, exp > now ? "ok" : "error"));
   } else items.unshift(info(claims ? "No expiry (exp) claim" : "Payload is not a JSON object", sigNote, "info"));
-  if (claims || (pj && pj.ok)) {
-    const v = pj.value;
-    items.push(row("Payload", JSON.stringify(v, null, INDENT), oneLine(JSON.stringify(v), 100), "jwt"));
+  // Shown and copied with number literals kept exactly (large numeric IDs would otherwise be rounded)
+  const px = pj && pj.ok ? parseExact(payload) : null;
+  if (px) {
+    const v = px.value;
+    items.push(row("Payload", stringify(v, INDENT), oneLine(stringify(v), 100), "jwt"));
   } else {
     const raw = payload !== null ? payload : p;
     items.push(row("Payload (not JSON)", raw, oneLine(raw, 100), "jwt"));
   }
   items.push(row(`Header · ${alg || "no alg"}`, JSON.stringify(hv, null, INDENT), oneLine(JSON.stringify(hv), 100), "jwt"));
   const NAMES = { iss: "Issuer", sub: "Subject", aud: "Audience", exp: "Expires", nbf: "Not before", iat: "Issued at", jti: "JWT ID", scope: "Scope", email: "Email", name: "Name" };
-  for (const [k, v] of Object.entries(claims || {})) {
-    const label = NAMES[k] ? `${NAMES[k]} (${k})` : k;
+  for (const [k, v] of Object.entries(claims ? px.value : {})) {
+    const label = own(NAMES, k) ? `${NAMES[k]} (${k})` : k;
     if (["exp", "nbf", "iat", "auth_time"].includes(k) && typeof v === "number" && validDate(v * 1000)) {
       const d = new Date(v * 1000);
       items.push(row(`${label}: ${localString(d)}`, String(v), `${relTime(v * 1000)} · ${d.toISOString()} · ↩ Copy value`, "clock"));
     } else {
-      const val = typeof v === "string" ? v : JSON.stringify(v);
+      const val = isRawNum(v) ? restore(`"${v}"`) : typeof v === "string" ? v : stringify(v);
       items.push(row(`${label}: ${val}`, val, "↩ Copy value · ⌘↩ Paste", "jwt"));
     }
   }
@@ -1027,7 +1043,7 @@ function encItems(query) {
   }
   if (/&(#\d+|#x[0-9a-f]+|[a-z]+);/i.test(t)) {
     const h = t.replace(/&(#\d+|#x[0-9a-f]+|[a-z]+);/gi, (all, e) =>
-      e[0] === "#" ? safeCodePoint(e[1].toLowerCase() === "x" ? parseInt(e.slice(2), 16) : parseInt(e.slice(1), 10)) ?? all : HTML_DEC[e.toLowerCase()] ?? all
+      e[0] === "#" ? safeCodePoint(e[1].toLowerCase() === "x" ? parseInt(e.slice(2), 16) : parseInt(e.slice(1), 10)) ?? all : lookup(HTML_DEC, e.toLowerCase()) ?? all
     );
     if (h !== t) decoded.push(row(`HTML decode: ${oneLine(h, 80)}`, h, "Entities replaced with characters", "enc"));
   }
@@ -1132,7 +1148,10 @@ function writeFile(path, text) {
 }
 
 function unifiedDiff(a, b, labelA, labelB) {
-  const dir = cacheDir();
+  // One diff at a time: the folder is emptied first, so copies of compared files don't pile up in the cache
+  const fm = $.NSFileManager.defaultManager, dir = `${cacheDir()}/diff`;
+  fm.removeItemAtPathError(dir, $());
+  fm.createDirectoryAtPathWithIntermediateDirectoriesAttributesError(dir, true, $(), $());
   const fa = `${dir}/${labelA}.txt`, fb = `${dir}/${labelB}.txt`;
   writeFile(fa, a.endsWith("\n") ? a : a + "\n");
   writeFile(fb, b.endsWith("\n") ? b : b + "\n");
@@ -1166,8 +1185,9 @@ function diffItems(query) {
     a = read(files[0]);
     b = read(files[1]);
     if (a === null || b === null) return [info("Can't read those files as UTF-8 text", `${files.map((f) => f.split("/").pop()).join(" · ")} · up to 10 MB each`, "error")];
-    la = files[0].split("/").pop().replace(/[^\w.-]/g, "_") + ".a";
-    lb = files[1].split("/").pop().replace(/[^\w.-]/g, "_") + ".b";
+    // kept short: "<name>.a.txt" must stay within the 255-byte file name limit
+    la = files[0].split("/").pop().replace(/[^\w.-]/g, "_").slice(0, 100) + ".a";
+    lb = files[1].split("/").pop().replace(/[^\w.-]/g, "_").slice(0, 100) + ".b";
   } else {
     const h = clipboardHistory(2);
     if (h === null) return [info("Alfred's Clipboard History is not available", "Turn it on in Alfred Preferences → Features → Clipboard History, or select two files and use the Universal Action", "error")];
@@ -1187,7 +1207,7 @@ function diffItems(query) {
     if (a === b) return [info("Same JSON", "Only formatting or key order differs", "ok")];
   }
   const d = unifiedDiff(a, b, la, lb);
-  if (d.text === null) return [info("diff failed", "", "error")];
+  if (d.text === null) return [info("Could not compare the texts", "The diff command failed. Try again, or check that the workflow’s cache folder is writable", "error")];
   const st = diffStats(d.text);
   // The diff travels as a file path, so large diffs don't bloat the Script Filter JSON
   const file = `${cacheDir()}/devtoolbox.diff`;
@@ -1232,7 +1252,7 @@ function diffAction(arg) {
       kaleidoscope: ["/usr/bin/env", ["ksdiff", a, b]],
       bbedit: ["/usr/bin/env", ["bbdiff", a, b]],
     };
-    const [cmd, args] = cmds[app] || cmds.filemerge;
+    const [cmd, args] = lookup(cmds, app) || cmds.filemerge;
     const t = $.NSTask.alloc.init;
     t.executableURL = $.NSURL.fileURLWithPath(cmd);
     t.arguments = args;
@@ -1272,7 +1292,7 @@ function smartItems(query) {
   // with a tool name ("hash tables are…"), so multi-line text is never delegated, and a delegated
   // argument that the tool can't use falls back to detection on the whole text.
   const m = query.match(/^(\w+)(?:[ \t]+([\s\S]*))?$/);
-  const handler = m && HANDLERS[m[1].toLowerCase()];
+  const handler = m && lookup(HANDLERS, m[1].toLowerCase());
   if (handler && !/[\r\n]/.test(query)) {
     const res = handler(m[2] || "");
     if (!m[2] || res.some((it) => it.valid !== false)) return res;
