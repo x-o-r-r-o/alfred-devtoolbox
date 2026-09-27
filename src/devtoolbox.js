@@ -1418,7 +1418,8 @@ function smartItems(query) {
   else if (t.includes("\n") && csvToJSON(t)) items.push(...jsonItems(src));
   else if ((ids = decodeIdItems(t, true))) items.push(...ids);
   else if (/^-?\d{9,19}(\.\d+)?$/.test(t) || (/^\d{4}-\d{2}-\d{2}/.test(t) && !isNaN(Date.parse(t)))) items.push(...epochItems(t));
-  if (!ids && t.length <= 200 && !t.includes("\n")) items.push(...caseItems(src).filter((it) => it.valid !== false).slice(0, 5));
+  // Case rows only for text with letters: for a number or a date they all repeated it unchanged
+  if (!ids && t.length <= 200 && !t.includes("\n") && /\p{L}/u.test(t)) items.push(...caseItems(src).filter((it) => it.valid !== false).slice(0, 5));
   items.push(...encItems(src));
   items.push(...hashItems(src).filter((it) => it.valid !== false));
   return items;

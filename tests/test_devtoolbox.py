@@ -222,6 +222,13 @@ class EpochTests(unittest.TestCase):
         secs = [int(a) for a in args(it) if re.fullmatch(r"\d{10}", a)]
         self.assertLess(abs(secs[0] - time.time()), 5)
 
+    def test_smart_hub_skips_case_rows_without_letters(self):
+        # Found in the README screenshots: a timestamp got camelCase, PascalCase… rows that repeated it
+        subs = [i.get("subtitle", "") for i in sf("smart", "1790500000")]
+        self.assertFalse(any("camelCase" in x for x in subs))
+        subs = [i.get("subtitle", "") for i in sf("smart", "user profile")]
+        self.assertTrue(any("camelCase" in x for x in subs))
+
     def test_rows_keep_their_uid_between_reruns(self):
         # Found in real Alfred: the clock reruns every second, and without uids the selection
         # jumped back to the first row, so ↩ copied the wrong format
