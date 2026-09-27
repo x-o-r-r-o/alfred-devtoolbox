@@ -137,7 +137,7 @@ class JWTTests(unittest.TestCase):
     def test_typed_and_invalid(self):
         self.assertTrue(sf("jwt", JWT)[1]["title"].startswith("Payload"))
         self.assertEqual(sf("jwt", clipboard="hello")[0]["title"], "Not a JWT")
-        self.assertEqual(sf("jwt", clipboard="a.b.c")[0]["title"], "Could not decode JWT")
+        self.assertEqual(sf("jwt", clipboard="a.b.c")[0]["title"], "Couldn’t decode the JWT")
 
 
 class RegexTests(unittest.TestCase):
@@ -214,7 +214,7 @@ class EpochTests(unittest.TestCase):
     def test_dates(self):
         it = sf("epoch", "2024-02-29T12:00:00Z")
         self.assertIn("1709208000", args(it))
-        self.assertEqual(sf("epoch", "banana")[0]["title"], "Could not read that date")
+        self.assertEqual(sf("epoch", "banana")[0]["title"], "Couldn’t read that date")
 
     def test_now(self):
         import time
@@ -244,7 +244,7 @@ class DiffTests(unittest.TestCase):
         write(b, "x")
         self.assertEqual(sf("diff", f"{a}\t{b}")[0]["title"], "Identical")
         write(b, b"\xff\xfe\x00")
-        self.assertTrue(sf("diff", f"{a}\t{b}")[0]["title"].startswith("Can't read"))
+        self.assertTrue(sf("diff", f"{a}\t{b}")[0]["title"].startswith("Couldn’t read"))
 
 
 class SmartTests(unittest.TestCase):
@@ -340,7 +340,7 @@ class LargeAndFileTests(unittest.TestCase):
         self.assertEqual(find(it, "SHA-256")["arg"], digest)
         it = sf("hash", f, clipboard="0" * 64)
         self.assertTrue(it[0]["title"].startswith("✗"))
-        self.assertEqual(sf("hash", CACHE)[0]["title"], "That's a folder")
+        self.assertEqual(sf("hash", CACHE)[0]["title"], "That’s a folder")
         self.assertEqual(find(sf("hash", "", clipboard=""), "Clipboard is empty")["valid"], False)
 
 
@@ -452,7 +452,7 @@ class RegressionTests(unittest.TestCase):
         self.assertTrue(any(i["title"].startswith("⚠ Unsigned") for i in it))
         it = sf("jwt", clipboard=f"{none}.{b64url(b'hello world')}.")
         self.assertEqual(find(it, "Payload (not JSON)")["arg"], "hello world")
-        self.assertEqual(sf("jwt", clipboard=f"{b64url(b'null')}.{b64url({'a': 1})}.")[0]["title"], "Could not decode JWT")
+        self.assertEqual(sf("jwt", clipboard=f"{b64url(b'null')}.{b64url({'a': 1})}.")[0]["title"], "Couldn’t decode the JWT")
 
     def test_jwt_out_of_range_dates(self):
         it = sf("jwt", clipboard=f"{b64url({'alg': 'HS256'})}.{b64url({'exp': 1e20, 'iat': -1e20})}.x")
@@ -654,7 +654,7 @@ class FinalReviewTests(unittest.TestCase):
         self.assertIn("constructor: 1", titles)
         self.assertIn("__proto__: 2", titles)
         it = sf("jwt", tok + " secret")
-        self.assertTrue(any(t["title"].startswith("Can't verify") for t in it))
+        self.assertTrue(any(t["title"].startswith("Can’t verify") for t in it))
 
     def test_jwt_payload_keeps_big_numbers(self):
         payload = b'{"id":12345678901234567890}'
@@ -802,11 +802,11 @@ class Round4Tests(unittest.TestCase):
         self.assertTrue(sf("diff", DT_TEST_CLIPBOARD_DB=db)[0]["title"].startswith("+1 −1 · previous → current"))
         c.execute("BEGIN EXCLUSIVE")  # Alfred writing: wait, then say so instead of "turn it on"
         t = time.time()
-        self.assertEqual(sf("diff", DT_TEST_CLIPBOARD_DB=db)[0]["title"], "Couldn't read Alfred's Clipboard History")
+        self.assertEqual(sf("diff", DT_TEST_CLIPBOARD_DB=db)[0]["title"], "Couldn’t read Alfred’s Clipboard History")
         self.assertLess(time.time() - t, 5)
         c.execute("ROLLBACK")
         c.close()
-        self.assertEqual(sf("diff")[0]["title"], "Alfred's Clipboard History is not available")
+        self.assertEqual(sf("diff")[0]["title"], "Alfred’s Clipboard History is not available")
 
     def test_diff_app_found_outside_alfreds_path(self):
         d = tempfile.mkdtemp(prefix="tools dir ")

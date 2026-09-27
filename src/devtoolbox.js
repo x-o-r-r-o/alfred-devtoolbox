@@ -282,11 +282,11 @@ function jsonError(s) {
         ws();
         if (s[i] !== '"') fail(s[i] === "}" ? "Trailing comma" : "Expected a double-quoted key");
         str(); ws();
-        if (s[i] !== ":") fail("Expected ':' after the key");
+        if (s[i] !== ":") fail("Expected “:” after the key");
         i++; value(); ws();
         if (s[i] === ",") { i++; continue; }
         if (s[i] === "}") { i++; return; }
-        fail("Expected ',' or '}'");
+        fail("Expected “,” or “}”");
       }
     }
     if (c === "[") {
@@ -298,7 +298,7 @@ function jsonError(s) {
         value(); ws();
         if (s[i] === ",") { i++; continue; }
         if (s[i] === "]") { i++; return; }
-        fail("Expected ',' or ']'");
+        fail("Expected “,” or “]”");
       }
     }
     if (c === '"') return str();
@@ -832,7 +832,7 @@ function jwtItems(query) {
   const header = b64urlDecode(h), payload = b64urlDecode(p);
   const hj = header && parseJSON(header);
   if (!hj || !hj.ok || !hj.value || typeof hj.value !== "object" || Array.isArray(hj.value))
-    return [info("Could not decode JWT", "The header is not base64url-encoded JSON", "error")];
+    return [info("Couldn’t decode the JWT", "The header is not base64url-encoded JSON", "error")];
   const hv = hj.value, alg = typeof hv.alg === "string" ? hv.alg : "";
   const pj = payload !== null ? parseJSON(payload) : null;
   const claims = pj && pj.ok && pj.value && typeof pj.value === "object" && !Array.isArray(pj.value) ? pj.value : null;
@@ -846,9 +846,9 @@ function jwtItems(query) {
   } else if (secret) {
     if (own(HMAC, alg)) {
       const ok = hmacB64url(alg, secret, `${h}.${p}`) === sig;
-      items.push(info(ok ? `✓ Signature verified (${alg})` : `✗ Invalid signature (${alg})`, ok ? "The secret matches" : "The secret doesn't match, or the token was changed", ok ? "ok" : "error"));
+      items.push(info(ok ? `✓ Signature verified (${alg})` : `✗ Invalid signature (${alg})`, ok ? "The secret matches" : "The secret doesn’t match, or the token was changed", ok ? "ok" : "error"));
       sigNote = ok ? "Signature verified" : "Invalid signature";
-    } else items.push(info(`Can't verify ${alg || "this"} signatures`, "Only HS256, HS384 and HS512 secrets can be checked here", "info"));
+    } else items.push(info(`Can’t verify ${alg || "this"} signatures`, "Only HS256, HS384 and HS512 secrets can be checked here", "info"));
   } else if (own(HMAC, alg)) sigNote = "Signature not verified · type the secret after the keyword to check it";
   // Validity
   if (claims && typeof claims.nbf === "number" && validDate(claims.nbf * 1000) && claims.nbf * 1000 > now)
@@ -1039,12 +1039,12 @@ function hashItems(query) {
   }
   const fm = $.NSFileManager.defaultManager, isDir = Ref();
   if (path.startsWith("/") && fm.fileExistsAtPathIsDirectory(path, isDir)) {
-    if (isDir[0]) return [info("That's a folder", "Hash works on a single file", "error")];
+    if (isDir[0]) return [info("That’s a folder", "Hash works on a single file", "error")];
     const attrs = fm.attributesOfItemAtPathError(path, $());
-    if (attrs.isNil()) return [info("Can't read that file", path, "error")];
+    if (attrs.isNil()) return [info("Couldn’t read that file", path, "error")];
     if (Number(attrs.fileSize) > MAX_FILE) return [info("File too large", "Hashing is limited to 1 GB", "error")];
     data = $.NSData.dataWithContentsOfFileOptionsError(path, 1, $());
-    if (data.isNil()) return [info("Can't read that file", path, "error")];
+    if (data.isNil()) return [info("Couldn’t read that file", path, "error")];
     label = `${copied ? "copied file " : ""}${path.split("/").pop()} (${plural(Number(data.length), "byte")})`;
     isFile = true;
   } else {
@@ -1163,7 +1163,7 @@ function epochItems(query) {
     else { d = new Date(n / 1e6); how = "Unix nanoseconds"; }
   } else {
     const t = Date.parse(q);
-    if (isNaN(t)) return [info("Could not read that date", "Type a Unix timestamp, an ISO 8601 date, or leave empty for now", "error")];
+    if (isNaN(t)) return [info("Couldn’t read that date", "Type a Unix timestamp, an ISO 8601 date, or leave empty for now", "error")];
     d = new Date(t);
     how = "Date";
   }
@@ -1249,14 +1249,14 @@ function diffItems(query) {
     };
     a = read(files[0]);
     b = read(files[1]);
-    if (a === null || b === null) return [info("Can't read those files as UTF-8 text", `${files.map((f) => f.split("/").pop()).join(" · ")} · up to 10 MB each`, "error")];
+    if (a === null || b === null) return [info("Couldn’t read those files as UTF-8 text", `${files.map((f) => f.split("/").pop()).join(" · ")} · up to 10 MB each`, "error")];
     // kept short: "<name>.a.txt" must stay within the 255-byte file name limit
     la = files[0].split("/").pop().replace(/[^\w.-]/g, "_").slice(0, 100) + ".a";
     lb = files[1].split("/").pop().replace(/[^\w.-]/g, "_").slice(0, 100) + ".b";
   } else {
     const h = clipboardHistory(2);
-    if (h === "missing") return [info("Alfred's Clipboard History is not available", "Turn it on in Alfred Preferences → Features → Clipboard History, or copy two files in Finder", "error")];
-    if (h === "error") return [info("Couldn't read Alfred's Clipboard History", "The database is busy or unreadable. Try again in a moment", "error")];
+    if (h === "missing") return [info("Alfred’s Clipboard History is not available", "Turn it on in Alfred Preferences → Features → Clipboard History, or copy two files in Finder", "error")];
+    if (h === "error") return [info("Couldn’t read Alfred’s Clipboard History", "The database is busy or unreadable. Try again in a moment", "error")];
     if (h.length < 2) return [info("Need two text entries in Clipboard History", "Copy the two texts to compare, then try again", "info")];
     b = h[0];
     a = h[1];
@@ -1273,7 +1273,7 @@ function diffItems(query) {
     if (a === b) return [info("Same JSON", "Only formatting or key order differs", "ok")];
   }
   const d = unifiedDiff(a, b, la, lb);
-  if (d.text === null) return [info("Could not compare the texts", "The diff command failed. Try again, or check that the workflow’s cache folder is writable", "error")];
+  if (d.text === null) return [info("Couldn’t compare the texts", "The diff command returned an error. Try again, or check that the workflow’s cache folder is writable", "error")];
   const st = diffStats(d.text);
   // The diff travels as a file path, so large diffs don't bloat the Script Filter JSON
   const file = `${cacheDir()}/devtoolbox.diff`;
@@ -1327,7 +1327,7 @@ function diffAction(arg) {
   const file = env("diff_file", arg);
   if (action === "copy") {
     const s = $.NSString.stringWithContentsOfFileEncodingError(file, $.NSUTF8StringEncoding, $());
-    if (s.isNil()) return "Could not read the diff";
+    if (s.isNil()) return "Couldn’t read the diff";
     const pb = $.NSPasteboard.generalPasteboard;
     pb.clearContents;
     pb.setStringForType(s, $.NSPasteboardTypeString);
@@ -1345,9 +1345,9 @@ function diffAction(arg) {
     t.environment = env2;
     t.standardOutput = $.NSFileHandle.fileHandleWithNullDevice; // not a pipe: opendiff returns at once instead of waiting for FileMerge
     t.standardError = $.NSFileHandle.fileHandleWithNullDevice;
-    if (!t.launchAndReturnError($())) return `Could not start ${spec.name}`;
+    if (!t.launchAndReturnError($())) return `Couldn’t start ${spec.name}`;
     t.waitUntilExit;
-    if (t.terminationStatus !== 0) return spec === DIFF_APPS.filemerge ? "FileMerge needs Xcode installed" : `${spec.name} could not open the comparison`;
+    if (t.terminationStatus !== 0) return spec === DIFF_APPS.filemerge ? "FileMerge needs Xcode installed" : `${spec.name} couldn’t open the comparison`;
     return "";
   }
   // No app registered for .diff files: fall back to the default text editor
