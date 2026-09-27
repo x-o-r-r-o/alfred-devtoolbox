@@ -222,6 +222,18 @@ class EpochTests(unittest.TestCase):
         secs = [int(a) for a in args(it) if re.fullmatch(r"\d{10}", a)]
         self.assertLess(abs(secs[0] - time.time()), 5)
 
+    def test_rows_keep_their_uid_between_reruns(self):
+        # Found in real Alfred: the clock reruns every second, and without uids the selection
+        # jumped back to the first row, so ↩ copied the wrong format
+        import time
+        a = [i["uid"] for i in sf("epoch")]
+        time.sleep(1.1)
+        b = [i["uid"] for i in sf("epoch")]
+        self.assertEqual(a, b)
+        self.assertEqual(len(set(a)), len(a))
+        # typing something else gives new uids, so the selection resets to the top as usual
+        self.assertNotEqual([i["uid"] for i in sf("case", "hello")], [i["uid"] for i in sf("case", "hello world")])
+
 
 class DiffTests(unittest.TestCase):
     def test_files(self):
@@ -791,6 +803,15 @@ class Round4Tests(unittest.TestCase):
         write(b, "2\n")
         self.assertTrue(sf("diff", DT_TEST_CLIPBOARD_FILES=f"{a}\t{b}")[0]["title"].startswith("+1 −1 · a.txt → b.txt"))
 
+    def test_diff_headers_show_real_names(self):
+        # Found in real Alfred: the copied diff showed the cache copies ("one txt.a.txt")
+        d = tempfile.mkdtemp()
+        a, b = os.path.join(d, "one txt"), os.path.join(d, "two.txt")
+        write(a, "1\n")
+        write(b, "2\n")
+        diff = open(sf("diff", f"{a}\t{b}")[0]["arg"]).read()
+        self.assertTrue(diff.startswith("--- one txt\n+++ two.txt\n"), diff[:80])
+
     def test_diff_clipboard_history_database(self):
         import sqlite3, time
         db = os.path.join(CACHE, "clipboard.alfdb")
@@ -824,6 +845,16 @@ class Round4Tests(unittest.TestCase):
             self.assertEqual(f.read(), "--diff\n/x/a b.txt\n/x/b.txt\n")
         out = run_raw(["diff-action", "/x/f.diff"], diff_app="kaleidoscope", **common)
         self.assertEqual(out.stdout.strip(), "Kaleidoscope: its command-line tool (ksdiff) is not installed")
+
+    def test_bbdiff_differ_status_is_not_an_error(self):
+        # Found in real Alfred: bbdiff exits 1 when the files differ, which showed "BBEdit couldn’t open the comparison"
+        d = tempfile.mkdtemp()
+        for tool, status in (("bbdiff", 1), ("code", 1)):
+            write(os.path.join(d, tool), "#!/bin/sh\nexit %d\n" % status)
+            os.chmod(os.path.join(d, tool), 0o755)
+        common = dict(diff_action="app", diff_a="/x/a.txt", diff_b="/x/b.txt", DT_TEST_TOOL_DIRS=d)
+        self.assertEqual(run_raw(["diff-action", "/x/f.diff"], diff_app="bbedit", **common).stdout, "")
+        self.assertEqual(run_raw(["diff-action", "/x/f.diff"], diff_app="vscode", **common).stdout.strip(), "Visual Studio Code couldn’t open the comparison")
 
 
 if __name__ == "__main__":

@@ -120,7 +120,19 @@ function info(title, subtitle, icon = "info") {
   return { title, subtitle: subtitle || "", valid: false, icon: { path: `icons/${icon}.png` } };
 }
 
+// Rows need a uid for Alfred to keep the selected row while the Script Filter reruns (rerun):
+// without one the selection jumps back to the first row on every rerun (found in real Alfred).
+// The uid is the position plus the title with its numbers masked, so countdowns, prices and clocks
+// keep it, while typing something new changes it and the selection resets to the top as usual.
+function stableUids(items) {
+  items.forEach((it, i) => {
+    if (it && !it.uid) it.uid = `${i}|${String(it.title || "").replace(/[0-9]+/g, "#")}`;
+  });
+  return items;
+}
+
 function output(items, extra = {}) {
+  stableUids(items);
   return JSON.stringify(Object.assign({ skipknowledge: true, items }, extra), (k, v) =>
     typeof v !== "string" ? v : k === "title" || k === "subtitle" ? wellFormed(displayText(v)) : wellFormed(v)
   );
@@ -1207,7 +1219,7 @@ function writeFile(path, text) {
   $(wellFormed(text)).writeToFileAtomicallyEncodingError(path, true, $.NSUTF8StringEncoding, $());
 }
 
-function unifiedDiff(a, b, labelA, labelB) {
+function unifiedDiff(a, b, labelA, labelB, nameA = labelA, nameB = labelB) {
   // One diff at a time: the folder is emptied first, so copies of compared files don't pile up in the cache
   const fm = $.NSFileManager.defaultManager, dir = `${cacheDir()}/diff`;
   fm.removeItemAtPathError(dir, $());
@@ -1215,8 +1227,9 @@ function unifiedDiff(a, b, labelA, labelB) {
   const fa = `${dir}/${labelA}.txt`, fb = `${dir}/${labelB}.txt`;
   writeFile(fa, a.endsWith("\n") ? a : a + "\n");
   writeFile(fb, b.endsWith("\n") ? b : b + "\n");
-  // diff exits 1 when files differ, so run through sh to normalise the status; "--" guards names starting with "-"
-  const out = pipe("/bin/sh", ["-c", 'cd "$0" && /usr/bin/diff -u -- "$1" "$2"; [ $? -le 1 ]', dir, `${labelA}.txt`, `${labelB}.txt`]);
+  // diff exits 1 when files differ, so run through sh to normalise the status; "--" guards names starting with "-".
+  // --label puts the real names in the ---/+++ headers instead of the cache copies' names
+  const out = pipe("/bin/sh", ["-c", 'cd "$0" && /usr/bin/diff -u --label "$3" --label "$4" -- "$1" "$2"; [ $? -le 1 ]', dir, `${labelA}.txt`, `${labelB}.txt`, nameA, nameB]);
   return { text: out, fileA: fa, fileB: fb };
 }
 
@@ -1238,7 +1251,7 @@ function diffItems(query) {
   }
   const pathLike = files.length > 1 && files.every((f) => f.startsWith("/"));
   if (pathLike && files.length !== 2) return [info("Select exactly two files", `${plural(files.length, "file")} selected`, "error")];
-  let a, b, la, lb;
+  let a, b, la, lb, na, nb;
   if (pathLike) {
     const fm = $.NSFileManager.defaultManager;
     const read = (p) => {
@@ -1251,8 +1264,10 @@ function diffItems(query) {
     b = read(files[1]);
     if (a === null || b === null) return [info("Couldn’t read those files as UTF-8 text", `${files.map((f) => f.split("/").pop()).join(" · ")} · up to 10 MB each`, "error")];
     // kept short: "<name>.a.txt" must stay within the 255-byte file name limit
-    la = files[0].split("/").pop().replace(/[^\w.-]/g, "_").slice(0, 100) + ".a";
-    lb = files[1].split("/").pop().replace(/[^\w.-]/g, "_").slice(0, 100) + ".b";
+    na = files[0].split("/").pop();
+    nb = files[1].split("/").pop();
+    la = na.replace(/[^\w.-]/g, "_").slice(0, 100) + ".a";
+    lb = nb.replace(/[^\w.-]/g, "_").slice(0, 100) + ".b";
   } else {
     const h = clipboardHistory(2);
     if (h === "missing") return [info("Alfred’s Clipboard History is not available", "Turn it on in Alfred Preferences → Features → Clipboard History, or copy two files in Finder", "error")];
@@ -1260,8 +1275,8 @@ function diffItems(query) {
     if (h.length < 2) return [info("Need two text entries in Clipboard History", "Copy the two texts to compare, then try again", "info")];
     b = h[0];
     a = h[1];
-    la = "previous";
-    lb = "current";
+    la = na = "previous";
+    lb = nb = "current";
   }
   if (a === b) return [info("Identical", "Both texts are the same", "ok")];
   let jsonNote = "";
@@ -1272,7 +1287,7 @@ function diffItems(query) {
     jsonNote = " · JSON, keys sorted";
     if (a === b) return [info("Same JSON", "Only formatting or key order differs", "ok")];
   }
-  const d = unifiedDiff(a, b, la, lb);
+  const d = unifiedDiff(a, b, la, lb, na, nb);
   if (d.text === null) return [info("Couldn’t compare the texts", "The diff command returned an error. Try again, or check that the workflow’s cache folder is writable", "error")];
   const st = diffStats(d.text);
   // The diff travels as a file path, so large diffs don't bloat the Script Filter JSON
@@ -1303,7 +1318,8 @@ const DIFF_APPS = {
   filemerge: { name: "FileMerge", tool: "opendiff", dirs: ["/usr/bin"] },
   vscode: { name: "Visual Studio Code", tool: "code", args: ["--diff"], bundle: ["com.microsoft.VSCode", "Contents/Resources/app/bin/code"] },
   kaleidoscope: { name: "Kaleidoscope", tool: "ksdiff" },
-  bbedit: { name: "BBEdit", tool: "bbdiff", bundle: ["com.barebones.bbedit", "Contents/Helpers/bbdiff"] },
+  // bbdiff exits like diff: 1 means "the files differ", not an error
+  bbedit: { name: "BBEdit", tool: "bbdiff", bundle: ["com.barebones.bbedit", "Contents/Helpers/bbdiff"], okStatus: [0, 1] },
 };
 const TOOL_PATH = "/usr/local/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin";
 
@@ -1347,7 +1363,7 @@ function diffAction(arg) {
     t.standardError = $.NSFileHandle.fileHandleWithNullDevice;
     if (!t.launchAndReturnError($())) return `Couldn’t start ${spec.name}`;
     t.waitUntilExit;
-    if (t.terminationStatus !== 0) return spec === DIFF_APPS.filemerge ? "FileMerge needs Xcode installed" : `${spec.name} couldn’t open the comparison`;
+    if (!(spec.okStatus || [0]).includes(t.terminationStatus)) return spec === DIFF_APPS.filemerge ? "FileMerge needs Xcode installed" : `${spec.name} couldn’t open the comparison`;
     return "";
   }
   // No app registered for .diff files: fall back to the default text editor
