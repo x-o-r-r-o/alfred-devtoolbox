@@ -98,13 +98,14 @@ What they get wrong, from their READMEs, CHANGELOGs and issues (raycast/extensio
 - [ ] `hash` / `diff` with files copied in Finder; ⌥↩ with VS Code installed but no `code` command in PATH.
 
 ## Verify in real Alfred (v1.2, `fake`)
-- [ ] ↩ on a password row: the Conditional takes the "Password" branch; Alfred's Clipboard History (and e.g. Maccy) doesn't keep it; with the checkbox off it's kept.
-- [ ] `fake json 3 email,password`: ↩ also takes the "Password" branch (transient), and ⌘Y shows nothing.
-- [ ] ⌘↩ pastes through the transient paste object; normal rows still go through `resolve.sh` (JSON 1000 records pastes in full).
-- [ ] ⌥↩ closes Alfred and reopens it on `fake <generator> …` with the same row selected on top (no Automation prompt, since Alfred runs the script).
-- [ ] ⌘Y Quick Look on paragraphs / JSON rows shows the text file from the cache folder.
-- [ ] Workflow Configuration: Fake data locale popup and the transient checkbox; `keyword_fake` changed to something else works for ⌥↩.
-- [ ] Screenshot `images/fake.png`.
+- [x] ↩ on a password row: the Conditional takes the "Password" branch; Alfred's Clipboard History (and e.g. Maccy) doesn't keep it; with the checkbox off it's kept.
+- [x] `fake json 3 email,password`: ↩ also takes the "Password" branch (transient), and ⌘Y shows nothing.
+- [x] ⌘↩ pastes through the transient paste object; normal rows still go through `resolve.sh` (JSON 1000 records pastes in full).
+- [x] ⌥↩ closes Alfred and reopens it on `fake <generator> …` with the same row selected on top (no Automation prompt, since Alfred runs the script).
+- [x] ⌘Y Quick Look on paragraphs / JSON rows shows the text file from the cache folder.
+- [x] Workflow Configuration: Fake data locale popup and the transient checkbox; `keyword_fake` changed to something else works for ⌥↩.
+- [x] Screenshot `images/fake.png`.
+  Checked in Alfred 5 on 2026-09-29: pasteboard carries `org.nspasteboard.TransientType` on the Password branch and not on normal rows or with the checkbox off; ⌘↩ pasted a password and 1000 JSON records into TextEdit; ⌥↩ reopened with `@de email 3` and with `keyword_fake` set to `mock`; ⌘Y showed the paragraphs and JSON previews and nothing on the JSON-with-password row.
 
 ## Release checklist (Alfred forum + Gallery)
 Sources: alfred.app/submit, alfred.app/submit/styleguide, alfred.app/submit/screenshots, alfredforum.com topics 23976 and 23388.
