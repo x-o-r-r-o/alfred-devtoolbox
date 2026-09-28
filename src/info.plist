@@ -37,6 +37,18 @@
 			</dict>
 			<dict>
 				<key>destinationuid</key>
+				<string>9C8EA8E0-EFA1-5803-8BC9-B527F07AF094</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>sourceoutputuid</key>
+				<string>5F24F985-C981-5762-8D9F-6DBBC8FA7C3E</string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+			<dict>
+				<key>destinationuid</key>
 				<string>3E28DA7B-A607-5484-8DDB-365B69C6EE9B</string>
 				<key>modifiers</key>
 				<integer>0</integer>
@@ -175,6 +187,18 @@
 				<string></string>
 				<key>sourceoutputuid</key>
 				<string>05B2F687-F63E-5814-82CE-294BE805698A</string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+			<dict>
+				<key>destinationuid</key>
+				<string>EC770113-FD73-5622-9C53-1B3026112785</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>sourceoutputuid</key>
+				<string>B64A3F08-A1F1-5956-9469-43A95656468B</string>
 				<key>vitoclose</key>
 				<false/>
 			</dict>
@@ -1063,6 +1087,20 @@
 						<key>uid</key>
 						<string>01DA1522-ED57-5F68-8CF1-40654BC83F72</string>
 					</dict>
+					<dict>
+						<key>inputstring</key>
+						<string>{var:fake_secret}</string>
+						<key>matchcasesensitive</key>
+						<false/>
+						<key>matchmode</key>
+						<integer>0</integer>
+						<key>matchstring</key>
+						<string>2</string>
+						<key>outputlabel</key>
+						<string>Password, kept in history</string>
+						<key>uid</key>
+						<string>5F24F985-C981-5762-8D9F-6DBBC8FA7C3E</string>
+					</dict>
 				</array>
 				<key>elselabel</key>
 				<string>Other</string>
@@ -1094,6 +1132,20 @@
 						<string>Password</string>
 						<key>uid</key>
 						<string>05B2F687-F63E-5814-82CE-294BE805698A</string>
+					</dict>
+					<dict>
+						<key>inputstring</key>
+						<string>{var:fake_secret}</string>
+						<key>matchcasesensitive</key>
+						<false/>
+						<key>matchmode</key>
+						<integer>0</integer>
+						<key>matchstring</key>
+						<string>2</string>
+						<key>outputlabel</key>
+						<string>Password, kept in history</string>
+						<key>uid</key>
+						<string>B64A3F08-A1F1-5956-9469-43A95656468B</string>
 					</dict>
 				</array>
 				<key>elselabel</key>
@@ -1398,7 +1450,7 @@ Every keyword can be changed in the Workflow’s Configuration.
 		<key>3A061B69-A44E-520C-8715-067E46B2FDA8</key>
 		<dict>
 			<key>note</key>
-			<string>Passwords are copied as transient items</string>
+			<string>Passwords skip resolve.sh: copied as transient items, or directly when that is turned off</string>
 			<key>xpos</key>
 			<integer>470</integer>
 			<key>ypos</key>

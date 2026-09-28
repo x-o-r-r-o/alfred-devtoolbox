@@ -365,11 +365,18 @@
           "mode": 0,
           "match": "1",
           "label": "Password"
+        },
+        {
+          "id": "plain",
+          "input": "{var:fake_secret}",
+          "mode": 0,
+          "match": "2",
+          "label": "Password, kept in history"
         }
       ],
       "elselabel": "Other",
       "hideelse": false,
-      "note": "Passwords are copied as transient items"
+      "note": "Passwords skip resolve.sh: copied as transient items, or directly when that is turned off"
     },
     {
       "id": "cond_paste",
@@ -381,6 +388,13 @@
           "mode": 0,
           "match": "1",
           "label": "Password"
+        },
+        {
+          "id": "plain",
+          "input": "{var:fake_secret}",
+          "mode": 0,
+          "match": "2",
+          "label": "Password, kept in history"
         }
       ],
       "elselabel": "Other",
@@ -568,12 +582,22 @@
     },
     {
       "from": "cond_copy",
+      "to": "copy",
+      "output": "plain"
+    },
+    {
+      "from": "cond_copy",
       "to": "resolve"
     },
     {
       "from": "cond_paste",
       "to": "paste_secret",
       "output": "secret"
+    },
+    {
+      "from": "cond_paste",
+      "to": "paste",
+      "output": "plain"
     },
     {
       "from": "cond_paste",

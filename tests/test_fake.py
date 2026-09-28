@@ -176,7 +176,7 @@ class PasswordTests(unittest.TestCase):
         self.assertEqual(pw["mods"]["alt"]["variables"], {"fake_secret": "0"})
         self.assertNotIn("quicklookurl", pw)
         self.assertFalse([f for f in os.listdir(CACHE) if f.startswith("fake-preview-")])
-        self.assertEqual(fake("password", fake_transient="0")[0]["variables"], {"fake_secret": "0"})
+        self.assertEqual(fake("password", fake_transient="0")[0]["variables"], {"fake_secret": "2"})
         self.assertEqual(fake("email")[0]["variables"], {"fake_secret": "0"})
 
     def test_passphrase_words_come_from_the_list(self):
@@ -574,6 +574,12 @@ class RuntimeTests(unittest.TestCase):
             clip = objs[secret[0]["destinationuid"]]["config"]
             self.assertEqual((clip["transient"], clip["autopaste"]), (True, paste))
             self.assertIn("resolve.sh", objs[other[0]["destinationuid"]]["config"]["script"])
+            # a password copied with the transient option off still never reaches resolve.sh's argv
+            plain = [c for c in out if c.get("sourceoutputuid") == cond["config"]["conditions"][1]["uid"]]
+            self.assertEqual(cond["config"]["conditions"][1]["matchstring"], "2")
+            clip = objs[plain[0]["destinationuid"]]
+            self.assertEqual(clip["type"], "alfred.workflow.output.clipboard")
+            self.assertEqual((clip["config"]["transient"], clip["config"]["autopaste"]), (False, paste))
         vars_ = {c["variable"]: c for c in p["userconfigurationconfig"]}
         self.assertEqual(vars_["keyword_fake"]["config"]["default"], "fake")
         self.assertEqual(vars_["fake_locale"]["config"]["default"], "en_US")

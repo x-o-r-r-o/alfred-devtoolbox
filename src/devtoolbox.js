@@ -2085,7 +2085,9 @@ function fakeItem(spec, q) {
   const hint = values.length > 1 ? `${values.length} × ${label} · ${sep === "\n\n" ? "separated by blank lines" : "one per line"}` : label;
   const subtitle = `${hint}${sub ? ` · ${sub}` : ""}`;
   const transient = secret && env("fake_transient", "1").trim() !== "0";
-  const vars = { fake_secret: transient ? "1" : "0" };
+  // fake_secret: 1 = transient copy, 2 = ordinary copy that skips resolve.sh (a password never becomes a
+  // process argument), 0 = everything else (through resolve.sh, which reads large values from the cache)
+  const vars = { fake_secret: secret ? (transient ? "1" : "2") : "0" };
   // Values over 10 KB travel through the cache (like DevToolbox's large results) so that a broad filter with a
   // big count ("fake a 1000") stays a small Script Filter response. Secrets are never written to disk.
   const it = row(title || label, value, subtitle, spec.icon || "fake", { uid: `fake.${id}` }, secret ? Infinity : 10000);
