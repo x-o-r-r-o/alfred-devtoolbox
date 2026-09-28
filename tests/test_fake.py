@@ -22,8 +22,17 @@ def fake(query="", **env):
     return sf("fake", query, **env)
 
 
+def value(item):
+    """The copied value: large ones are resolved from the cache like resolve.sh does."""
+    arg = item["arg"]
+    if arg.startswith("dtfile:"):
+        with open(arg[7:], encoding="utf-8") as f:
+            return f.read()
+    return arg
+
+
 def lines(item):
-    return item["arg"].split("\n")
+    return value(item).split("\n")
 
 
 def by_uid(items, gid):
@@ -464,6 +473,57 @@ class RegenerateTests(unittest.TestCase):
         it = sf("smart", "fake email 3")
         self.assertEqual(len(lines(it[0])), 3)
         self.assertNotIn("alt", it[0]["mods"])
+
+
+class AuditOneTests(unittest.TestCase):
+    """Logic audit: one test per bug."""
+
+    def test_regenerate_keeps_brand_and_country(self):
+        self.assertEqual(fake("card amex")[0]["mods"]["alt"]["arg"], "card amex")
+        self.assertEqual(fake("iban nl 3")[0]["mods"]["alt"]["arg"], "iban nl 3")
+        self.assertEqual(by_uid(fake(), "card")["mods"]["alt"]["arg"], "card")
+
+    def test_card_details_match_the_card_row(self):
+        it = fake("card")
+        number = by_uid(it, "card")["arg"]
+        details = by_uid(it, "card-details")["arg"].split("\n")
+        self.assertEqual(details[1].replace(" ", ""), number)
+        self.assertIn(f"exp {details[3][4:]}", by_uid(it, "card")["subtitle"])
+
+    def test_punctuated_and_non_latin_words(self):
+        self.assertEqual(fake("e-mail")[0]["uid"], "fake.email")
+        self.assertEqual(fake("名前")[0]["title"], "No matching generator")
+        self.assertEqual(fake("Ünicode")[0]["title"], "No matching generator")
+
+    def test_blank_line_hint(self):
+        self.assertIn("separated by blank lines", fake("address 2")[0]["subtitle"])
+        self.assertIn("one per line", fake("email 2")[0]["subtitle"])
+
+    def test_words_before_ranges_and_dice(self):
+        self.assertEqual(fake("number 1-10")[0]["uid"], "fake.range")
+        self.assertTrue(1 <= int(fake("random 1..10")[0]["arg"]) <= 10)
+        self.assertEqual(fake("roll 2d6")[0]["uid"], "fake.dice-roll")
+        self.assertEqual(fake("dice d20 3")[0]["uid"], "fake.dice-roll")
+        self.assertEqual(fake("dice")[0]["uid"], "fake.dice")
+
+
+class ResponseSizeTests(unittest.TestCase):
+    def test_broad_filter_with_big_count_stays_small(self):
+        out = subprocess.run(["osascript", "-l", "JavaScript", "./devtoolbox.js", "fake", "a 1000"], cwd=SRC,
+                             env=dict(os.environ, alfred_workflow_cache=CACHE), capture_output=True, timeout=30)
+        self.assertLess(len(out.stdout), 150000)
+        it = json.loads(out.stdout)["items"]
+        big = [i for i in it if i["arg"].startswith("dtfile:")]
+        self.assertTrue(big)
+        r = subprocess.run(["/bin/bash", "./resolve.sh", big[0]["arg"]], cwd=SRC, capture_output=True,
+                           env=dict(os.environ, alfred_workflow_cache=CACHE))
+        self.assertEqual(len(r.stdout.decode("utf-8").split("\n")), 1000)
+
+    def test_secrets_never_go_through_the_cache(self):
+        it = fake("password 256 100")
+        for i in it:
+            self.assertFalse(i["arg"].startswith("dtfile:"), i["uid"])
+            self.assertEqual(len(i["arg"].split("\n")), 100)
 
 
 class RuntimeTests(unittest.TestCase):

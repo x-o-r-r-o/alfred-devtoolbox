@@ -94,10 +94,10 @@ function safeCodePoint(n) {
 // so the Script Filter JSON stays small. text.copy defaults to arg, so it is only set when needed.
 const LARGE = 50000;
 let largeCount = 0;
-function row(title, value, subtitle, icon, extra = {}) {
+function row(title, value, subtitle, icon, extra = {}, limit = LARGE) {
   let v = String(value);
   const text = {};
-  if (v.length > LARGE) {
+  if (v.length > limit) {
     const path = `${cacheDir()}/result-${largeCount++}.txt`;
     writeFile(path, v);
     v = `dtfile:${path}`;
@@ -1476,7 +1476,7 @@ function configuredLocale() {
 // ASCII for emails, usernames and domains: Müller → mueller, Chloé → chloe
 const UMLAUT = { ä: "ae", ö: "oe", ü: "ue", Ä: "Ae", Ö: "Oe", Ü: "Ue", ß: "ss", æ: "ae", Æ: "Ae", œ: "oe", Œ: "Oe" };
 function asciiWord(s) {
-  return s.replace(/[äöüÄÖÜßæÆœŒ]/g, (c) => UMLAUT[c]).normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^A-Za-z0-9]+/g, "").toLowerCase();
+  return s.replace(/[äöüÄÖÜßæÆœŒ]/g, (c) => UMLAUT[c]).normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^A-Za-z0-9]+/g, "").toLowerCase();
 }
 
 const pad2 = (n) => String(n).padStart(2, "0");
@@ -1848,11 +1848,11 @@ const FAKE_GENS = [
   { id: "csv", label: "CSV records", kw: "data table spreadsheet mock", icon: "json", structured: "csv" },
   { id: "sql", label: "SQL INSERT", kw: "database insert rows mock", icon: "json", structured: "sql" },
   { id: "jsonl", label: "JSON Lines records", kw: "ndjson data mock", icon: "json", more: true, structured: "jsonl" },
-  { id: "card", label: "Test card number", kw: "credit debit payment visa mastercard amex american express discover diners jcb unionpay stripe", icon: "card",
+  { id: "card", label: "Test card number", kw: "credit debit payment visa mastercard amex american express discover diners jcb unionpay stripe", icon: "card", usesWords: true,
     gen: (c) => c.card().number, title: (v) => cardSpaced(v), detail: (n, c) => `${c.card().brand} · exp ${c.card().exp} · CVC ${c.card().cvc} · published test number, not a real card` },
   { id: "card-details", label: "Test card (all details)", kw: "credit payment full", icon: "card", more: true, sep: "\n\n",
-    gen: (c) => { const k = fakeCard(c); return `${k.brand}\n${cardSpaced(k.number)}\n${fullName(c)}\nExp ${k.exp}\nCVC ${k.cvc}`; }, detail: () => "published test number, not a real card" },
-  { id: "iban", label: "IBAN", kw: `bank account ${IBAN_COUNTRIES.map(([cc, n]) => `${cc.toLowerCase()} ${n}`).join(" ")}`, icon: "card",
+    usesWords: true, gen: (c) => { const k = c.card(); return `${k.brand}\n${cardSpaced(k.number)}\n${fullName(c)}\nExp ${k.exp}\nCVC ${k.cvc}`; }, detail: () => "published test number, not a real card" },
+  { id: "iban", label: "IBAN", kw: `bank account ${IBAN_COUNTRIES.map(([cc, n]) => `${cc.toLowerCase()} ${n}`).join(" ")}`, icon: "card", usesWords: true,
     gen: (c) => fakeIBAN(ibanCountry(c)), title: (v) => v.replace(/(.{4})(?=.)/g, "$1 "), detail: () => "valid check digits, random account: test data only" },
   { id: "price", label: "Price", kw: "amount money cost currency", icon: "card", gen: (c) => money(c, between(100, 99999)) },
   { id: "currency", label: "Currency code", kw: "iso 4217 money", icon: "card", more: true, gen: (c) => pick(c.F.C.currencies) },
@@ -2063,11 +2063,15 @@ function pickRows(kind, rest) {
 
 // Word-prefix match against the generator's id, label and keywords
 function fold(s) {
-  return s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+  return s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 }
 function genMatches(g, words) {
   const hay = [g.id, ...fold(`${g.id} ${g.label} ${g.kw}`).split(/[^a-z0-9]+/)].filter(Boolean);
-  return words.every((w) => hay.some((h) => h.startsWith(w)));
+  const has = (w) => hay.some((h) => h.startsWith(w));
+  return words.every((w) => {
+    const parts = w.split(/[^a-z0-9]+/).filter(Boolean);
+    return has(w) || (parts.length > 0 && parts.every(has));
+  });
 }
 
 // One Alfred row. uid = generator id, so the selection stays on the same generator when values change.
@@ -2078,11 +2082,13 @@ function fakeItem(spec, q) {
   const value = values.join(sep);
   const shown = values.slice(0, 20).map((v) => (spec.title ? spec.title(v) : v).replace(/\s*\n+\s*/g, ", "));
   const title = spec.display || (values.length > 1 && !spec.multiline ? shown.join(" · ") : shown[0]);
-  const hint = values.length > 1 ? `${values.length} × ${label} · one per line` : label;
+  const hint = values.length > 1 ? `${values.length} × ${label} · ${sep === "\n\n" ? "separated by blank lines" : "one per line"}` : label;
   const subtitle = `${hint}${sub ? ` · ${sub}` : ""}`;
   const transient = secret && env("fake_transient", "1").trim() !== "0";
   const vars = { fake_secret: transient ? "1" : "0" };
-  const it = row(title || label, value, subtitle, spec.icon || "fake", { uid: `fake.${id}` });
+  // Values over 10 KB travel through the cache (like DevToolbox's large results) so that a broad filter with a
+  // big count ("fake a 1000") stays a small Script Filter response. Secrets are never written to disk.
+  const it = row(title || label, value, subtitle, spec.icon || "fake", { uid: `fake.${id}` }, secret ? Infinity : 10000);
   it.variables = vars;
   it.mods.cmd.variables = vars;
   it.mods.cmd.subtitle = `Paste into the frontmost app${transient ? " (kept out of clipboard history)" : ""}`;
@@ -2125,13 +2131,14 @@ function fakeItems(query) {
     for (const s of specs) items.push(fakeItem(s, q));
   };
   let m;
-  if ((m = text.match(RANGE_RE))) {
+  const bare = text.replace(/^(?:number|random|range|integer|int|roll|dice|die)\s+(?=[\d-]|d\d)/i, "");
+  if ((m = bare.match(RANGE_RE))) {
     const r = rangeRows(m, xcount);
     if (r[0].valid === false) return r;
     emit(r.map((s) => ({ ...s, icon: "fake" })), exact);
     return items;
   }
-  if ((m = text.match(DICE_RE))) {
+  if ((m = bare.match(DICE_RE))) {
     const r = diceRows(m, xcount);
     if (r[0].valid === false) return r;
     emit(r.map((s) => ({ ...s, icon: "fake" })), exact);
@@ -2188,7 +2195,9 @@ function fakeItems(query) {
     if (g.id === "region") label = regionLabel(F.L);
     const spec = { id: g.id, label, values, sub, secret: g.secret, sep: g.sep, title: g.title, icon: g.icon, multiline: g.sep === "\n\n" };
     // ⌥↩ reopens Alfred on this generator alone, with the same length and count
-    const regen = () => [localeTok, g.id, g.param ? String(param) : "", count > 1 ? String(count) : ""].filter(Boolean).join(" ");
+    // (card and IBAN keep their brand or country words: "card amex", "iban nl")
+    const extra = g.usesWords ? words.filter((w) => w !== g.id) : [];
+    const regen = () => [localeTok, g.id, ...extra, g.param ? String(param) : "", count > 1 ? String(count) : ""].filter(Boolean).join(" ");
     items.push(fakeItem(spec, { regen }));
   }
   if (listAll && !raw) items.push(Object.assign(info("Tips: email 10 · password 32 · 1-100 · 3d6 · json 5 name,email", "pick a, b, c · @de address · card amex · iban nl · ⌥↩ on a row for new values", "info"), { uid: "fake.tips" }));
