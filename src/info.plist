@@ -21,6 +21,31 @@
 				<false/>
 			</dict>
 		</array>
+		<key>3A061B69-A44E-520C-8715-067E46B2FDA8</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>E43BC75E-D1CF-5970-9D0F-59B57345D33B</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>sourceoutputuid</key>
+				<string>01DA1522-ED57-5F68-8CF1-40654BC83F72</string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+			<dict>
+				<key>destinationuid</key>
+				<string>3E28DA7B-A607-5484-8DDB-365B69C6EE9B</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
 		<key>3E28DA7B-A607-5484-8DDB-365B69C6EE9B</key>
 		<array>
 			<dict>
@@ -74,7 +99,7 @@
 		<array>
 			<dict>
 				<key>destinationuid</key>
-				<string>3E28DA7B-A607-5484-8DDB-365B69C6EE9B</string>
+				<string>3A061B69-A44E-520C-8715-067E46B2FDA8</string>
 				<key>modifiers</key>
 				<integer>0</integer>
 				<key>modifiersubtext</key>
@@ -84,7 +109,7 @@
 			</dict>
 			<dict>
 				<key>destinationuid</key>
-				<string>1A5132AB-60D0-56A2-9D0B-3F56841A3180</string>
+				<string>6E82D2E7-F72F-51A9-810C-FA6B5E43EA38</string>
 				<key>modifiers</key>
 				<integer>1048576</integer>
 				<key>modifiersubtext</key>
@@ -139,6 +164,31 @@
 				<false/>
 			</dict>
 		</array>
+		<key>6E82D2E7-F72F-51A9-810C-FA6B5E43EA38</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>3184169F-0DAF-56FE-99F6-ABD25D017865</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>sourceoutputuid</key>
+				<string>05B2F687-F63E-5814-82CE-294BE805698A</string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+			<dict>
+				<key>destinationuid</key>
+				<string>1A5132AB-60D0-56A2-9D0B-3F56841A3180</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
 		<key>71FD1C77-368F-5423-B05D-4F219DD853B4</key>
 		<array>
 			<dict>
@@ -146,6 +196,39 @@
 				<string>5D0277E9-5497-5D57-A3BC-C0FD9AEA6336</string>
 				<key>modifiers</key>
 				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
+		<key>A3C35C1E-715C-502D-A9AA-BC3B3A8C80F8</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>3A061B69-A44E-520C-8715-067E46B2FDA8</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+			<dict>
+				<key>destinationuid</key>
+				<string>6E82D2E7-F72F-51A9-810C-FA6B5E43EA38</string>
+				<key>modifiers</key>
+				<integer>1048576</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+			<dict>
+				<key>destinationuid</key>
+				<string>BD9F377A-1255-5C92-AEF3-5BC2EBEF7C60</string>
+				<key>modifiers</key>
+				<integer>524288</integer>
 				<key>modifiersubtext</key>
 				<string></string>
 				<key>vitoclose</key>
@@ -330,7 +413,7 @@
 	<key>createdby</key>
 	<string>x-o-r-r-o</string>
 	<key>description</key>
-	<string>Format JSON, generate UUIDs, decode JWTs, test regex, change case, hash, encode, convert timestamps and diff text</string>
+	<string>Format JSON, generate UUIDs and fake data, decode JWTs, test regex, change case, hash, encode, convert timestamps and diff text</string>
 	<key>disabled</key>
 	<false/>
 	<key>name</key>
@@ -850,6 +933,57 @@
 		<dict>
 			<key>config</key>
 			<dict>
+				<key>alfredfiltersresults</key>
+				<false/>
+				<key>alfredfiltersresultsmatchmode</key>
+				<integer>0</integer>
+				<key>argumenttreatemptyqueryasnil</key>
+				<true/>
+				<key>argumenttrimmode</key>
+				<integer>0</integer>
+				<key>argumenttype</key>
+				<integer>1</integer>
+				<key>escaping</key>
+				<integer>102</integer>
+				<key>keyword</key>
+				<string>{var:keyword_fake}</string>
+				<key>queuedelaycustom</key>
+				<integer>3</integer>
+				<key>queuedelayimmediatelyinitially</key>
+				<true/>
+				<key>queuedelaymode</key>
+				<integer>0</integer>
+				<key>queuemode</key>
+				<integer>1</integer>
+				<key>runningsubtext</key>
+				<string>…</string>
+				<key>script</key>
+				<string>osascript -l JavaScript ./devtoolbox.js fake "$1"</string>
+				<key>scriptargtype</key>
+				<integer>1</integer>
+				<key>scriptfile</key>
+				<string></string>
+				<key>skipuniversalaction</key>
+				<true/>
+				<key>subtext</key>
+				<string>Names, emails, passwords, lorem ipsum, JSON records…</string>
+				<key>title</key>
+				<string>Fake Data</string>
+				<key>type</key>
+				<integer>0</integer>
+				<key>withspace</key>
+				<true/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.input.scriptfilter</string>
+			<key>uid</key>
+			<string>A3C35C1E-715C-502D-A9AA-BC3B3A8C80F8</string>
+			<key>version</key>
+			<integer>3</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
 				<key>acceptsfiles</key>
 				<false/>
 				<key>acceptsmulti</key>
@@ -907,6 +1041,70 @@
 			<string>alfred.workflow.trigger.universalaction</string>
 			<key>uid</key>
 			<string>71FD1C77-368F-5423-B05D-4F219DD853B4</string>
+			<key>version</key>
+			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>conditions</key>
+				<array>
+					<dict>
+						<key>inputstring</key>
+						<string>{var:fake_secret}</string>
+						<key>matchcasesensitive</key>
+						<false/>
+						<key>matchmode</key>
+						<integer>0</integer>
+						<key>matchstring</key>
+						<string>1</string>
+						<key>outputlabel</key>
+						<string>Password</string>
+						<key>uid</key>
+						<string>01DA1522-ED57-5F68-8CF1-40654BC83F72</string>
+					</dict>
+				</array>
+				<key>elselabel</key>
+				<string>Other</string>
+				<key>hideelse</key>
+				<false/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.utility.conditional</string>
+			<key>uid</key>
+			<string>3A061B69-A44E-520C-8715-067E46B2FDA8</string>
+			<key>version</key>
+			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>conditions</key>
+				<array>
+					<dict>
+						<key>inputstring</key>
+						<string>{var:fake_secret}</string>
+						<key>matchcasesensitive</key>
+						<false/>
+						<key>matchmode</key>
+						<integer>0</integer>
+						<key>matchstring</key>
+						<string>1</string>
+						<key>outputlabel</key>
+						<string>Password</string>
+						<key>uid</key>
+						<string>05B2F687-F63E-5814-82CE-294BE805698A</string>
+					</dict>
+				</array>
+				<key>elselabel</key>
+				<string>Other</string>
+				<key>hideelse</key>
+				<false/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.utility.conditional</string>
+			<key>uid</key>
+			<string>6E82D2E7-F72F-51A9-810C-FA6B5E43EA38</string>
 			<key>version</key>
 			<integer>1</integer>
 		</dict>
@@ -993,6 +1191,67 @@
 			<string>EC770113-FD73-5622-9C53-1B3026112785</string>
 			<key>version</key>
 			<integer>3</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>autopaste</key>
+				<false/>
+				<key>clipboardtext</key>
+				<string>{query}</string>
+				<key>ignoredynamicplaceholders</key>
+				<true/>
+				<key>transient</key>
+				<true/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.output.clipboard</string>
+			<key>uid</key>
+			<string>E43BC75E-D1CF-5970-9D0F-59B57345D33B</string>
+			<key>version</key>
+			<integer>3</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>autopaste</key>
+				<true/>
+				<key>clipboardtext</key>
+				<string>{query}</string>
+				<key>ignoredynamicplaceholders</key>
+				<true/>
+				<key>transient</key>
+				<true/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.output.clipboard</string>
+			<key>uid</key>
+			<string>3184169F-0DAF-56FE-99F6-ABD25D017865</string>
+			<key>version</key>
+			<integer>3</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>concurrently</key>
+				<false/>
+				<key>escaping</key>
+				<integer>102</integer>
+				<key>script</key>
+				<string>osascript -l JavaScript ./devtoolbox.js fake-again "$1"</string>
+				<key>scriptargtype</key>
+				<integer>1</integer>
+				<key>scriptfile</key>
+				<string></string>
+				<key>type</key>
+				<integer>0</integer>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.action.script</string>
+			<key>uid</key>
+			<string>BD9F377A-1255-5C92-AEF3-5BC2EBEF7C60</string>
+			<key>version</key>
+			<integer>2</integer>
 		</dict>
 		<dict>
 			<key>config</key>
@@ -1087,6 +1346,27 @@ Encode or decode Base64, Base64URL, URL encoding, HTML entities, hex, backslash 
 
 Convert Unix timestamps (seconds, milliseconds, microseconds or nanoseconds) and dates via the `epoch` keyword. Leave it empty for the current time.
 
+### Fake data
+
+Generate names, emails, phone numbers, addresses, companies, passwords, lorem ipsum, dates, IP addresses, colours, IBANs, test card numbers and more via the `fake` keyword. The rows describe one person, so the email matches the name and the postcode matches the city. Type to filter, and add a number for several values (`fake email 10`) or for a length (`fake password 32`, `fake lorem 5`).
+
+* &lt;kbd&gt;↩&lt;/kbd&gt; Copy the value.
+* &lt;kbd&gt;⌘&lt;/kbd&gt;&lt;kbd&gt;↩&lt;/kbd&gt; Paste the value into the frontmost app.
+* &lt;kbd&gt;⌥&lt;/kbd&gt;&lt;kbd&gt;↩&lt;/kbd&gt; Generate new values for the same row.
+* &lt;kbd&gt;⌘&lt;/kbd&gt;&lt;kbd&gt;Y&lt;/kbd&gt; Quick Look longer text, like paragraphs or records.
+* &lt;kbd&gt;⌘&lt;/kbd&gt;&lt;kbd&gt;L&lt;/kbd&gt; Show the value in Large Type.
+
+A few shortcuts:
+
+* `fake 1-100` for a random number, with a count for unique numbers (`fake 1-49 6`), a shuffled range, and decimals.
+* `fake 3d6+2`, `fake d20` or `fake coin` to roll dice or flip a coin.
+* `fake pick tea, coffee, water` to pick one item or shuffle the list.
+* `fake json 5 name,email,city` for records as JSON, CSV, SQL `INSERT` and JSON Lines. Rename a field with `key:field`, like `user:username`.
+* `fake @de address` for one search in another locale: `@us`, `@uk`, `@au`, `@de` or `@fr`. Set the default in the Workflow’s Configuration.
+* `fake card amex` or `fake iban nl` for a brand or a country.
+
+The data is safe to use in tests: emails use the reserved `example.com` domains, phone numbers come from ranges reserved for films and TV, card numbers are published test numbers, and IBANs have valid check digits but random accounts. Passwords come from the system’s secure random number generator and are kept out of clipboard history (turn that off in the Workflow’s Configuration).
+
 ### Diff
 
 Compare the last two text entries of Alfred’s Clipboard History (turn it on in Alfred’s Features) via the `diff` keyword. JSON is compared with its keys sorted, so only real changes show.
@@ -1104,16 +1384,32 @@ Every keyword can be changed in the Workflow’s Configuration.
 		<key>1A5132AB-60D0-56A2-9D0B-3F56841A3180</key>
 		<dict>
 			<key>xpos</key>
-			<integer>470</integer>
+			<integer>690</integer>
 			<key>ypos</key>
 			<integer>150</integer>
+		</dict>
+		<key>3184169F-0DAF-56FE-99F6-ABD25D017865</key>
+		<dict>
+			<key>xpos</key>
+			<integer>690</integer>
+			<key>ypos</key>
+			<integer>410</integer>
+		</dict>
+		<key>3A061B69-A44E-520C-8715-067E46B2FDA8</key>
+		<dict>
+			<key>note</key>
+			<string>Passwords are copied as transient items</string>
+			<key>xpos</key>
+			<integer>470</integer>
+			<key>ypos</key>
+			<integer>20</integer>
 		</dict>
 		<key>3E28DA7B-A607-5484-8DDB-365B69C6EE9B</key>
 		<dict>
 			<key>note</key>
 			<string>Reads large results back from the cache</string>
 			<key>xpos</key>
-			<integer>470</integer>
+			<integer>690</integer>
 			<key>ypos</key>
 			<integer>20</integer>
 		</dict>
@@ -1122,7 +1418,7 @@ Every keyword can be changed in the Workflow’s Configuration.
 			<key>xpos</key>
 			<integer>30</integer>
 			<key>ypos</key>
-			<integer>930</integer>
+			<integer>1060</integer>
 		</dict>
 		<key>3FE5EAAA-1A96-53F4-A25E-A05ACCD05380</key>
 		<dict>
@@ -1152,19 +1448,33 @@ Every keyword can be changed in the Workflow’s Configuration.
 			<key>ypos</key>
 			<integer>540</integer>
 		</dict>
+		<key>6E82D2E7-F72F-51A9-810C-FA6B5E43EA38</key>
+		<dict>
+			<key>xpos</key>
+			<integer>470</integer>
+			<key>ypos</key>
+			<integer>150</integer>
+		</dict>
 		<key>71FD1C77-368F-5423-B05D-4F219DD853B4</key>
 		<dict>
 			<key>xpos</key>
 			<integer>30</integer>
 			<key>ypos</key>
-			<integer>1190</integer>
+			<integer>1320</integer>
 		</dict>
 		<key>9C8EA8E0-EFA1-5803-8BC9-B527F07AF094</key>
 		<dict>
 			<key>xpos</key>
-			<integer>690</integer>
+			<integer>910</integer>
 			<key>ypos</key>
 			<integer>20</integer>
+		</dict>
+		<key>A3C35C1E-715C-502D-A9AA-BC3B3A8C80F8</key>
+		<dict>
+			<key>xpos</key>
+			<integer>30</integer>
+			<key>ypos</key>
+			<integer>930</integer>
 		</dict>
 		<key>A84CFB16-6CBC-5651-A7DE-65DB837CB975</key>
 		<dict>
@@ -1194,12 +1504,21 @@ Every keyword can be changed in the Workflow’s Configuration.
 			<key>ypos</key>
 			<integer>20</integer>
 		</dict>
+		<key>BD9F377A-1255-5C92-AEF3-5BC2EBEF7C60</key>
+		<dict>
+			<key>note</key>
+			<string>⌥↩ reopens Alfred for new values</string>
+			<key>xpos</key>
+			<integer>250</integer>
+			<key>ypos</key>
+			<integer>410</integer>
+		</dict>
 		<key>D5414F1F-0DC7-569F-A0AF-A57341905C4D</key>
 		<dict>
 			<key>xpos</key>
 			<integer>690</integer>
 			<key>ypos</key>
-			<integer>280</integer>
+			<integer>540</integer>
 		</dict>
 		<key>D655C771-7DB7-549C-852F-6D23C2AABF6E</key>
 		<dict>
@@ -1220,7 +1539,14 @@ Every keyword can be changed in the Workflow’s Configuration.
 			<key>xpos</key>
 			<integer>30</integer>
 			<key>ypos</key>
-			<integer>1060</integer>
+			<integer>1190</integer>
+		</dict>
+		<key>E43BC75E-D1CF-5970-9D0F-59B57345D33B</key>
+		<dict>
+			<key>xpos</key>
+			<integer>690</integer>
+			<key>ypos</key>
+			<integer>280</integer>
 		</dict>
 		<key>E6A700E9-9332-507B-8CA1-DF280CE2E37E</key>
 		<dict>
@@ -1232,7 +1558,7 @@ Every keyword can be changed in the Workflow’s Configuration.
 		<key>EC770113-FD73-5622-9C53-1B3026112785</key>
 		<dict>
 			<key>xpos</key>
-			<integer>690</integer>
+			<integer>910</integer>
 			<key>ypos</key>
 			<integer>150</integer>
 		</dict>
@@ -1453,6 +1779,27 @@ Every keyword can be changed in the Workflow’s Configuration.
 			<key>config</key>
 			<dict>
 				<key>default</key>
+				<string>fake</string>
+				<key>placeholder</key>
+				<string>fake</string>
+				<key>required</key>
+				<true/>
+				<key>trim</key>
+				<true/>
+			</dict>
+			<key>description</key>
+			<string>Fake data</string>
+			<key>label</key>
+			<string></string>
+			<key>type</key>
+			<string>textfield</string>
+			<key>variable</key>
+			<string>keyword_fake</string>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>default</key>
 				<string>2</string>
 				<key>pairs</key>
 				<array>
@@ -1532,13 +1879,70 @@ Every keyword can be changed in the Workflow’s Configuration.
 			<key>variable</key>
 			<string>diff_app</string>
 		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>default</key>
+				<string>en_US</string>
+				<key>pairs</key>
+				<array>
+					<array>
+						<string>English (US)</string>
+						<string>en_US</string>
+					</array>
+					<array>
+						<string>English (UK)</string>
+						<string>en_GB</string>
+					</array>
+					<array>
+						<string>English (Australia)</string>
+						<string>en_AU</string>
+					</array>
+					<array>
+						<string>Deutsch</string>
+						<string>de_DE</string>
+					</array>
+					<array>
+						<string>Français</string>
+						<string>fr_FR</string>
+					</array>
+				</array>
+			</dict>
+			<key>description</key>
+			<string>Names, addresses and phone numbers. Type @us, @uk, @au, @de or @fr in a query to switch for one search.</string>
+			<key>label</key>
+			<string>Fake data</string>
+			<key>type</key>
+			<string>popupbutton</string>
+			<key>variable</key>
+			<string>fake_locale</string>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>default</key>
+				<true/>
+				<key>required</key>
+				<false/>
+				<key>text</key>
+				<string>Keep passwords out of clipboard history</string>
+			</dict>
+			<key>description</key>
+			<string>Clipboard managers that respect transient items (Alfred’s Clipboard History among them) don’t keep them.</string>
+			<key>label</key>
+			<string></string>
+			<key>type</key>
+			<string>checkbox</string>
+			<key>variable</key>
+			<string>fake_transient</string>
+		</dict>
 	</array>
 	<key>variables</key>
 	<dict/>
 	<key>variablesdontexport</key>
 	<array/>
 	<key>version</key>
-	<string>1.1.1</string>
+	<string>1.2.0</string>
 	<key>webaddress</key>
 	<string>https://github.com/x-o-r-r-o/alfred-devtoolbox</string>
 </dict>

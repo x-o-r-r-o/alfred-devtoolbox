@@ -276,7 +276,7 @@ class SmartTests(unittest.TestCase):
 
     def test_menu_and_delegate(self):
         menu = sf("smart", clipboard="")
-        self.assertEqual(len(menu), 9)
+        self.assertEqual(len(menu), 10)
         self.assertEqual(menu[0]["autocomplete"], "json ")
         self.assertEqual([i["title"].split()[0] for i in sf("smart", "js", clipboard="text")], ["JSON"])
         self.assertTrue(sf("smart", "uuid 3")[0]["title"].startswith("UUID v4 × 3"))

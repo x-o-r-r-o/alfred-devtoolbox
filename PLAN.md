@@ -1,6 +1,6 @@
 # DevToolbox — Plan
 
-**Priority tier:** 1 · **Bundle ID:** `io.github.x-o-r-r-o.devtoolbox` · **Keywords:** `dev`, `json`, `uuid`, `jwt`, `regex`, `case`, `hash`, `enc`, `epoch`, `diff`
+**Priority tier:** 1 · **Bundle ID:** `io.github.x-o-r-r-o.devtoolbox` · **Keywords:** `dev`, `json`, `uuid`, `jwt`, `regex`, `case`, `hash`, `enc`, `epoch`, `diff`, `fake`
 
 ## Why build it
 Raycast demand this workflow replaces (downloads, 2026-09-26):
@@ -43,6 +43,27 @@ Raycast demand this workflow replaces (downloads, 2026-09-26):
 - [x] New: `hash` hashes a file copied in Finder (instead of its name)
 - [x] New: `diff` compares two files copied in Finder
 
+## v1.2: Random and fake data (`fake`)
+Benchmark (Raycast Store installs, 2026-09-28): Random Data Generator 36,234 · Password Generator 41,935 · Lorem Ipsum 109,833.
+Alfred today: Fakeum (deanishe, Python 2: broken since macOS 12.3, its passwords are "not secure!!"), and Ruby-gem Faker workflows that need `gem install faker`.
+
+What they get wrong, from their READMEs, CHANGELOGs and issues (raycast/extensions #11504 "generate X of random data" / lengths like `{16}`, #10890 auto-paste, #14710 project names, #20174 JWT, #13411 languages; alfred-fakeum "multiple columns", "entire User json object", count delimiter not typeable on a US keyboard, "other locale doesn't work"), and how `fake` answers:
+
+- [x] Every generator in one list, filtered by typing (word prefixes, so `em` finds Email but not Lorem); rows only useful on request (UUID v7, ULID, HSL, JWT, MAC…) appear when asked for
+- [x] Counts and lengths as plain numbers: `fake email 10`, `fake password 32 5`, `fake digits 16`, `fake hex 64`, `fake lorem 5`, or `x10` (Raycast #11504)
+- [x] One coherent person and place per value across rows and record fields: the email and username match the name, the postcode and state match the city (Faker mixes them)
+- [x] Records: `fake json 5 name,email,city` as JSON, CSV, SQL INSERT and JSON Lines from the same records; typed values (id, age, lat, bool); `key:field` renames (Fakeum "multiple columns", "User json object")
+- [x] `fake 1-100` range (+ unique numbers / lottery draw with Floyd sampling, shuffled range, decimals), `fake 3d6+2`, `coin`, `pick a, b, c`, `shuffle`
+- [x] Passwords from SecRandomCopyBytes (fallback /dev/urandom, then NSUUID), unbiased rejection sampling, every character class present, entropy shown; passphrase (1,198-word list), letters+digits, no look-alikes, PIN
+- [x] Passwords copied and pasted as transient clipboard items (Conditional → Copy to Clipboard with "transient"), configurable; never written to the Quick Look cache
+- [x] Safe data: emails at example.com/.net/.org (RFC 2606); phone numbers only from regulator-reserved fiction ranges (NANP 555-0100–0199, Ofcom drama numbers, ACMA 5550/7010, Bundesnetzagentur drama numbers, ARCEP 01 99 00…); Stripe's published test card numbers (Luhn-valid); IBANs with valid ISO 13616 and national check digits (FR RIB key, BE, ES) for DE, GB, FR, NL, AT, CH, BE, ES; IPv4 outside reserved ranges; locally administered MACs; IPv6 outside 2001:db8::/32
+- [x] Locales en_US, en_GB, en_AU, de_DE, fr_FR (Workflow Configuration, or `@de` for one search); umlauts transliterated in emails (Müller → mueller)
+- [x] User agents whose Chrome/Firefox/Safari versions follow the calendar; project names (`zesty-moon`, Raycast #14710); JWT signed with HS256 and "secret" that the `jwt` keyword verifies (#20174)
+- [x] ↩ copy, ⌘↩ paste, ⌥↩ new values (reopens Alfred on that generator, so the same row is on top), ⌘Y Quick Look for multi-line values, ⌘L Large Type; stable `fake.<id>` uids; no rerun
+- [x] `dev fake …` from the hub (without ⌥↩, which the hub doesn't connect)
+- Data: `src/fake/*.json`, 34 KB written for DevToolbox (no Faker or EFF data copied; lorem ipsum is Cicero, public domain); read only by the `fake` command. Package: 389 KB → 561 KB (8 new icons ≈ 140 KB).
+- Performance: 60–90 ms per keystroke for the full list (osascript start-up included); counts capped at 1,000 per row, 100 when every generator is listed.
+
 ## Tech
 - **Stack:** JXA (`osascript -l JavaScript`) with the ObjC bridge: CommonCrypto (hashes, HMAC), zlib CRC32, NSPasteboard, NSTask. Bash for `resolve.sh`.
 - **Dependencies:** none at runtime. `/usr/bin/sqlite3` (ships with macOS) reads Alfred's Clipboard History; the ⌥↩ diff apps are optional.
@@ -50,6 +71,9 @@ Raycast demand this workflow replaces (downloads, 2026-09-26):
 - Target: macOS 13+ on Apple Silicon and Intel, Alfred 5 + Powerpack.
 
 ## Known limitations
+- `fake`: ⌘C copies with Alfred's own copy, which isn't marked transient: use ↩ for passwords. The `dev fake …` rows go through the same transient copy.
+- `fake`: job titles, lorem ipsum, countries and colour names are English in every locale; other locales (es, it, nl…) have no fiction-reserved phone ranges, so they aren't offered.
+- `fake`: record field names can't contain spaces or commas (`first-name:first` works).
 - A JWT secret typed after `jwt` is passed to the script as an argument (Alfred passes every Script Filter query that way), so it is briefly visible to `ps` for the current user. It is never shown, copied, logged or cached.
 - `diff` writes the compared texts (which may come from Clipboard History) to the workflow cache folder; they are replaced by the next diff and never leave the Mac.
 - `hash` treats a typed query that is an existing absolute path as a file.
@@ -66,6 +90,14 @@ Raycast demand this workflow replaces (downloads, 2026-09-26):
 - [ ] Screenshots for every `images/*.png` referenced in the README.
 - [ ] `regex a  => ` keeps the trailing spaces with "Don't trim arg spaces" (`argumenttrimmode` 1 is the second entry of Alfred's popup; confirm it shows as selected in the Script Filter).
 - [ ] `hash` / `diff` with files copied in Finder; ⌥↩ with VS Code installed but no `code` command in PATH.
+
+## Verify in real Alfred (v1.2, `fake`)
+- [ ] ↩ on a password row: the Conditional takes the "Password" branch; Alfred's Clipboard History (and e.g. Maccy) doesn't keep it; with the checkbox off it's kept.
+- [ ] ⌘↩ pastes through the transient paste object; normal rows still go through `resolve.sh` (JSON 1000 records pastes in full).
+- [ ] ⌥↩ closes Alfred and reopens it on `fake <generator> …` with the same row selected on top (no Automation prompt, since Alfred runs the script).
+- [ ] ⌘Y Quick Look on paragraphs / JSON rows shows the text file from the cache folder.
+- [ ] Workflow Configuration: Fake data locale popup and the transient checkbox; `keyword_fake` changed to something else works for ⌥↩.
+- [ ] Screenshot `images/fake.png`.
 
 ## Release checklist (Alfred forum + Gallery)
 Sources: alfred.app/submit, alfred.app/submit/styleguide, alfred.app/submit/screenshots, alfredforum.com topics 23976 and 23388.
@@ -84,6 +116,13 @@ Sources: alfred.app/submit, alfred.app/submit/styleguide, alfred.app/submit/scre
 - [x] Version 1.0.0 in `workflow.json`; `python3 tools/build.py --package` builds `dist/alfred-devtoolbox-1.0.0.alfredworkflow`
 - [ ] GitHub release with the `.alfredworkflow` attached (by the author)
 - [ ] Forum post in "Share your Workflows" with a screenshot, keywords, and the GitHub link (by the author)
+
+## Ideas for v1.3 (fake data)
+1. A Snippet Trigger (`:fake:email`) to type fake data anywhere (Fakeum's `xxfake`).
+2. More locales (es_ES, it_IT, nl_NL, ja_JP) once fiction-reserved phone ranges are confirmed, or with phone numbers left out.
+3. Date ranges (`fake date 2020-2024`) and custom formats.
+4. Pinned/favourite generators on top (Raycast pins), using the Alfred knowledge (`skipknowledge` off) for the list only.
+5. Custom SQL table name (`fake sql 5 name into customers`) and TSV/Markdown table output.
 
 ## Ideas for v1.1
 Ranked by value for effort (Raycast issues for Format JSON, UUID Generator, JWT Decoder, Change Case, Diff Checker, Unix Timestamp; 2026-09).

@@ -54,5 +54,37 @@
   "case": [
     "textformat",
     "#9333EA"
+  ],
+  "fake": [
+    "dice.fill",
+    "#0EA5E9"
+  ],
+  "person": [
+    "person.fill",
+    "#2563EB"
+  ],
+  "location": [
+    "mappin.and.ellipse",
+    "#DC2626"
+  ],
+  "lock": [
+    "lock.fill",
+    "#CA8A04"
+  ],
+  "lorem": [
+    "text.alignleft",
+    "#6B7280"
+  ],
+  "card": [
+    "creditcard.fill",
+    "#059669"
+  ],
+  "network": [
+    "network",
+    "#7C3AED"
+  ],
+  "colour": [
+    "paintpalette.fill",
+    "#DB2777"
   ]
 }

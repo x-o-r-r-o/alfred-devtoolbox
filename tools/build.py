@@ -123,13 +123,30 @@ def largetype(o):
     return ("alfred.workflow.output.largetype", 3, {"alignment": 0, "backgroundcolor": "", "fadespeed": 0, "fillmode": 0, "font": "", "ignoredynamicplaceholders": True, "largetypetext": o.get("text", "{query}"), "textcolor": "", "wrapat": 50})
 
 
-BUILDERS = {f.__name__: f for f in (scriptfilter, script, clipboard, notification, universalaction, fileaction, hotkey, external, argument, openurl, largetype)}
+def conditional(o):
+    # as in alfredapp/unit-converter-workflow, tinypng-workflow and shortcuts-workflow. matchmode: 0 = is equal to,
+    # 1 = is not equal to, 2 = is greater than, 4 = matches regex. "input" "" means {query}.
+    # Connections out of a condition name it with "output": "<condition id>" (becomes sourceoutputuid).
+    return ("alfred.workflow.utility.conditional", 1, {
+        "conditions": [{
+            "inputstring": c.get("input", ""), "matchcasesensitive": False, "matchmode": c["mode"],
+            "matchstring": c.get("match", ""), "outputlabel": c["label"], "uid": UID(f"{o['id']}/{c['id']}"),
+        } for c in o["conditions"]],
+        "elselabel": o.get("elselabel", "else"),
+        "hideelse": o.get("hideelse", False),
+    })
+
+
+UID = None
+
+BUILDERS = {f.__name__: f for f in (scriptfilter, script, clipboard, notification, universalaction, fileaction, hotkey, external, argument, openurl, largetype, conditional)}
 
 
 def build(check_only=False):
     spec = json.load(open(os.path.join(ROOT, "workflow.json")))
     bundle = spec["bundleid"]
-    uid = lambda i: str(uuid.uuid5(uuid.NAMESPACE_URL, f"{bundle}/{i}")).upper()
+    global UID
+    uid = UID = lambda i: str(uuid.uuid5(uuid.NAMESPACE_URL, f"{bundle}/{i}")).upper()
     ids = [o["id"] for o in spec["objects"]]
     errors = []
     if len(ids) != len(set(ids)):
@@ -163,12 +180,15 @@ def build(check_only=False):
             uidata[uid(o["id"])]["note"] = o["note"]
     connections = {}
     for c in spec["connections"]:
-        connections.setdefault(uid(c["from"]), []).append({
+        conn = {
             "destinationuid": uid(c["to"]),
             "modifiers": MODS[c.get("mod", "")],
             "modifiersubtext": c.get("modtext", ""),
             "vitoclose": c.get("vitoclose", False),
-        })
+        }
+        if "output" in c:
+            conn["sourceoutputuid"] = uid(f"{c['from']}/{c['output']}")
+        connections.setdefault(uid(c["from"]), []).append(conn)
     # keywords: >= 3 chars and configurable
     cfgvars = {c["variable"]: c for c in spec.get("config", [])}
     for o in spec["objects"]:

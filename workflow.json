@@ -1,11 +1,11 @@
 {
   "bundleid": "io.github.x-o-r-r-o.devtoolbox",
   "name": "DevToolbox",
-  "description": "Format JSON, generate UUIDs, decode JWTs, test regex, change case, hash, encode, convert timestamps and diff text",
+  "description": "Format JSON, generate UUIDs and fake data, decode JWTs, test regex, change case, hash, encode, convert timestamps and diff text",
   "category": "Tools",
   "createdby": "x-o-r-r-o",
   "webaddress": "https://github.com/x-o-r-r-o/alfred-devtoolbox",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "variablesdontexport": [],
   "config": [
     {
@@ -129,6 +129,18 @@
       }
     },
     {
+      "type": "textfield",
+      "variable": "keyword_fake",
+      "label": "",
+      "description": "Fake data",
+      "config": {
+        "default": "fake",
+        "placeholder": "fake",
+        "required": true,
+        "trim": true
+      }
+    },
+    {
       "type": "popupbutton",
       "variable": "json_indent",
       "label": "JSON indent",
@@ -187,6 +199,48 @@
             "bbedit"
           ]
         ]
+      }
+    },
+    {
+      "type": "popupbutton",
+      "variable": "fake_locale",
+      "label": "Fake data",
+      "description": "Names, addresses and phone numbers. Type @us, @uk, @au, @de or @fr in a query to switch for one search.",
+      "config": {
+        "default": "en_US",
+        "pairs": [
+          [
+            "English (US)",
+            "en_US"
+          ],
+          [
+            "English (UK)",
+            "en_GB"
+          ],
+          [
+            "English (Australia)",
+            "en_AU"
+          ],
+          [
+            "Deutsch",
+            "de_DE"
+          ],
+          [
+            "Français",
+            "fr_FR"
+          ]
+        ]
+      }
+    },
+    {
+      "type": "checkbox",
+      "variable": "fake_transient",
+      "label": "",
+      "description": "Clipboard managers that respect transient items (Alfred’s Clipboard History among them) don’t keep them.",
+      "config": {
+        "default": true,
+        "required": false,
+        "text": "Keep passwords out of clipboard history"
       }
     }
   ],
@@ -274,6 +328,14 @@
       "script": "osascript -l JavaScript ./devtoolbox.js case \"$1\""
     },
     {
+      "id": "sf_fake",
+      "type": "scriptfilter",
+      "keyword": "{var:keyword_fake}",
+      "title": "Fake Data",
+      "subtext": "Names, emails, passwords, lorem ipsum, JSON records…",
+      "script": "osascript -l JavaScript ./devtoolbox.js fake \"$1\""
+    },
+    {
       "id": "ua_text",
       "type": "universalaction",
       "name": "Transform with DevToolbox",
@@ -292,6 +354,37 @@
       "name": "Hash with DevToolbox",
       "files": true,
       "multi": 0
+    },
+    {
+      "id": "cond_copy",
+      "type": "conditional",
+      "conditions": [
+        {
+          "id": "secret",
+          "input": "{var:fake_secret}",
+          "mode": 0,
+          "match": "1",
+          "label": "Password"
+        }
+      ],
+      "elselabel": "Other",
+      "hideelse": false,
+      "note": "Passwords are copied as transient items"
+    },
+    {
+      "id": "cond_paste",
+      "type": "conditional",
+      "conditions": [
+        {
+          "id": "secret",
+          "input": "{var:fake_secret}",
+          "mode": 0,
+          "match": "1",
+          "label": "Password"
+        }
+      ],
+      "elselabel": "Other",
+      "hideelse": false
     },
     {
       "id": "resolve",
@@ -313,6 +406,24 @@
       "id": "paste",
       "type": "clipboard",
       "autopaste": true
+    },
+    {
+      "id": "copy_secret",
+      "type": "clipboard",
+      "autopaste": false,
+      "transient": true
+    },
+    {
+      "id": "paste_secret",
+      "type": "clipboard",
+      "autopaste": true,
+      "transient": true
+    },
+    {
+      "id": "fake_again",
+      "type": "script",
+      "script": "osascript -l JavaScript ./devtoolbox.js fake-again \"$1\"",
+      "note": "⌥↩ reopens Alfred for new values"
     },
     {
       "id": "diff_run",
@@ -339,11 +450,11 @@
     },
     {
       "from": "sf_dev",
-      "to": "resolve"
+      "to": "cond_copy"
     },
     {
       "from": "sf_dev",
-      "to": "resolve_paste",
+      "to": "cond_paste",
       "mod": "cmd"
     },
     {
@@ -435,6 +546,38 @@
       "from": "sf_case",
       "to": "resolve_paste",
       "mod": "cmd"
+    },
+    {
+      "from": "sf_fake",
+      "to": "cond_copy"
+    },
+    {
+      "from": "sf_fake",
+      "to": "cond_paste",
+      "mod": "cmd"
+    },
+    {
+      "from": "sf_fake",
+      "to": "fake_again",
+      "mod": "alt"
+    },
+    {
+      "from": "cond_copy",
+      "to": "copy_secret",
+      "output": "secret"
+    },
+    {
+      "from": "cond_copy",
+      "to": "resolve"
+    },
+    {
+      "from": "cond_paste",
+      "to": "paste_secret",
+      "output": "secret"
+    },
+    {
+      "from": "cond_paste",
+      "to": "resolve_paste"
     },
     {
       "from": "resolve",

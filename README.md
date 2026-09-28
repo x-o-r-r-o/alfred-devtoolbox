@@ -1,6 +1,6 @@
 # <img src="src/icon.png" width="48" align="center"> DevToolbox
 
-Everyday developer transforms in Alfred: format JSON, generate UUIDs, decode JWTs, test regular expressions, hash, encode, convert timestamps and diff text. No dependencies: everything runs on tools that ship with macOS.
+Everyday developer transforms in Alfred: format JSON, generate UUIDs and fake test data, decode JWTs, test regular expressions, hash, encode, convert timestamps and diff text. No dependencies: everything runs on tools that ship with macOS.
 
 ## Usage
 
@@ -70,6 +70,29 @@ Encode or decode Base64, Base64URL, URL encoding, HTML entities, hex, backslash 
 Convert Unix timestamps (seconds, milliseconds, microseconds or nanoseconds) and dates via the `epoch` keyword. Leave it empty for the current time.
 
 ![Converting a Unix timestamp](images/epoch.png)
+
+### Fake data
+
+Generate names, emails, phone numbers, addresses, companies, passwords, lorem ipsum, dates, IP addresses, colours, IBANs, test card numbers and more via the `fake` keyword. The rows describe one person, so the email matches the name and the postcode matches the city. Type to filter, and add a number for several values (`fake email 10`) or for a length (`fake password 32`, `fake lorem 5`).
+
+![Generating fake data](images/fake.png)
+
+* <kbd>↩</kbd> Copy the value.
+* <kbd>⌘</kbd><kbd>↩</kbd> Paste the value into the frontmost app.
+* <kbd>⌥</kbd><kbd>↩</kbd> Generate new values for the same row.
+* <kbd>⌘</kbd><kbd>Y</kbd> Quick Look longer text, like paragraphs or records.
+* <kbd>⌘</kbd><kbd>L</kbd> Show the value in Large Type.
+
+A few shortcuts:
+
+* `fake 1-100` for a random number, with a count for unique numbers (`fake 1-49 6`), a shuffled range, and decimals.
+* `fake 3d6+2`, `fake d20` or `fake coin` to roll dice or flip a coin.
+* `fake pick tea, coffee, water` to pick one item or shuffle the list.
+* `fake json 5 name,email,city` for records as JSON, CSV, SQL `INSERT` and JSON Lines. Rename a field with `key:field`, like `user:username`.
+* `fake @de address` for one search in another locale: `@us`, `@uk`, `@au`, `@de` or `@fr`. Set the default in the Workflow’s Configuration.
+* `fake card amex` or `fake iban nl` for a brand or a country.
+
+The data is safe to use in tests: emails use the reserved `example.com` domains, phone numbers come from ranges reserved for films and TV, card numbers are published test numbers, and IBANs have valid check digits but random accounts. Passwords come from the system’s secure random number generator and are kept out of clipboard history (turn that off in the Workflow’s Configuration).
 
 ### Diff
 
