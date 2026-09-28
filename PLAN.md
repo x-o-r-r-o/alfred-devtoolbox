@@ -55,14 +55,19 @@ What they get wrong, from their READMEs, CHANGELOGs and issues (raycast/extensio
 - [x] Records: `fake json 5 name,email,city` as JSON, CSV, SQL INSERT and JSON Lines from the same records; typed values (id, age, lat, bool); `key:field` renames (Fakeum "multiple columns", "User json object")
 - [x] `fake 1-100` range (+ unique numbers / lottery draw with Floyd sampling, shuffled range, decimals), `fake 3d6+2`, `coin`, `pick a, b, c`, `shuffle`
 - [x] Passwords from SecRandomCopyBytes (fallback /dev/urandom, then NSUUID), unbiased rejection sampling, every character class present, entropy shown; passphrase (1,198-word list), letters+digits, no look-alikes, PIN
-- [x] Passwords copied and pasted as transient clipboard items (Conditional → Copy to Clipboard with "transient"), configurable; never written to the Quick Look cache
+- [x] Passwords copied and pasted as transient clipboard items (Conditional → Copy to Clipboard with "transient"), configurable; with the option off they still skip `resolve.sh`, so a password never becomes a process argument; never written to the cache
 - [x] Safe data: emails at example.com/.net/.org (RFC 2606); phone numbers only from regulator-reserved fiction ranges (NANP 555-0100–0199, Ofcom drama numbers, ACMA 5550/7010, Bundesnetzagentur drama numbers, ARCEP 01 99 00…); Stripe's published test card numbers (Luhn-valid); IBANs with valid ISO 13616 and national check digits (FR RIB key, BE, ES) for DE, GB, FR, NL, AT, CH, BE, ES; IPv4 outside reserved ranges; locally administered MACs; IPv6 outside 2001:db8::/32
 - [x] Locales en_US, en_GB, en_AU, de_DE, fr_FR (Workflow Configuration, or `@de` for one search); umlauts transliterated in emails (Müller → mueller)
 - [x] User agents whose Chrome/Firefox/Safari versions follow the calendar; project names (`zesty-moon`, Raycast #14710); JWT signed with HS256 and "secret" that the `jwt` keyword verifies (#20174)
 - [x] ↩ copy, ⌘↩ paste, ⌥↩ new values (reopens Alfred on that generator, so the same row is on top), ⌘Y Quick Look for multi-line values, ⌘L Large Type; stable `fake.<id>` uids; no rerun
 - [x] `dev fake …` from the hub (without ⌥↩, which the hub doesn't connect)
 - Data: `src/fake/*.json`, 34 KB written for DevToolbox (no Faker or EFF data copied; lorem ipsum is Cicero, public domain); read only by the `fake` command. Package: 389 KB → 561 KB (8 new icons ≈ 140 KB).
-- Performance: 60–90 ms per keystroke for the full list (osascript start-up included); counts capped at 1,000 per row, 100 when every generator is listed.
+- Performance (median, osascript start-up included): 70–85 ms per keystroke; other keywords +3 ms for the larger script. Counts capped at 1,000 per row (100 when every generator is listed, 100 for passwords); values over 10 KB go through the cache so a broad filter with a big count stays a small response. Worst case measured: `json 1000` with 40 fields ≈ 0.5 s.
+
+### Audits (v1.2)
+- [x] Logic: card details matched a different card than the card row; ⌥↩ dropped the brand/country (`card amex`, `iban nl`); the Street and Postcode rows didn't match the Address row; `e-mail` found nothing and non-Latin words matched everything; `number 1-10` / `roll 2d6` weren't understood; `fake a 1000` produced a 745 KB response; two regexes held raw combining characters instead of escapes
+- [x] Conventions: passwords went through `resolve.sh` argv when the transient option was off; prototype keys (`__proto__`, `constructor`, `toString` as fields, filters and locales), bidi/control characters in titles, invalid UTF-8 in argv, curly apostrophes, keyword clashes, explicit mod args
+- [x] Alfred runtime: no LANG, bare PATH, fresh install (cache folder created on first Quick Look), workflow and cache folders with spaces, config values `1`/`0`/` 0 `/empty/padded locale/bogus locale; macOS 13: no JS syntax newer than Safari 16 (no `??`, `?.`, `replaceAll`, `.at()`, lookbehind), SecRandomCopyBytes bound through `ObjC.bindFunction` with /dev/urandom and NSUUID fallbacks
 
 ## Tech
 - **Stack:** JXA (`osascript -l JavaScript`) with the ObjC bridge: CommonCrypto (hashes, HMAC), zlib CRC32, NSPasteboard, NSTask. Bash for `resolve.sh`.

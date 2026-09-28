@@ -537,6 +537,25 @@ class RuntimeTests(unittest.TestCase):
         e, it = run_alfred_fake("@fr name 20")
         self.assertTrue(any(re.search(r"[éèëïçô]", n) for n in lines(it[0])) or len(lines(it[0])) == 20)
 
+    def test_workflow_folder_with_spaces(self):
+        # Alfred runs scripts from "…/Application Support/Alfred/Alfred.alfredpreferences/workflows/user.workflow.X"
+        import shutil
+        home = tempfile.mkdtemp(prefix="fake home ")
+        wf = os.path.join(home, "Library", "Application Support", "Alfred", "Alfred.alfredpreferences", "workflows", "user.workflow.A B")
+        shutil.copytree(SRC, wf)
+        e = alfred_env(home, fake_locale=" fr_FR ", fake_transient="1", keyword_fake="")
+        out = subprocess.run(["/usr/bin/osascript", "-l", "JavaScript", "./devtoolbox.js", "fake", "address"], cwd=wf, env=e,
+                             capture_output=True, timeout=30)
+        self.assertEqual(out.returncode, 0, out.stderr)
+        it = json.loads(out.stdout.decode("utf-8"))["items"]
+        self.assertRegex(it[0]["arg"], r"\n\d{5} ")
+        r = subprocess.run(["/bin/bash", "./resolve.sh", "plain value"], cwd=wf, env=e, capture_output=True)
+        self.assertEqual(r.stdout, b"plain value")
+
+    def test_config_values_as_alfred_passes_them(self):
+        for v, want in (("1", "1"), ("0", "2"), (" 0 ", "2"), ("", "1")):
+            self.assertEqual(fake("pin", fake_transient=v)[0]["variables"]["fake_secret"], want, v)
+
     def test_random_fallbacks(self):
         for mode in ("urandom", "nsuuid"):
             it = fake("password 40 20", DT_TEST_RANDOM=mode)
