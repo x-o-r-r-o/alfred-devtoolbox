@@ -92,7 +92,7 @@ A few shortcuts:
 * `fake @de address` for one search in another locale: `@us`, `@uk`, `@au`, `@de` or `@fr`. Set the default in the Workflow’s Configuration.
 * `fake card amex` or `fake iban nl` for a brand or a country.
 
-The data is safe to use in tests: emails use the reserved `example.com` domains, phone numbers come from ranges reserved for films and TV, card numbers are published test numbers, and IBANs have valid check digits but random accounts. Passwords come from the system’s secure random number generator and are kept out of clipboard history (turn that off in the Workflow’s Configuration).
+The data is safe to use in tests: emails use the reserved `example.com` domains, phone numbers come from ranges reserved for films and TV, card numbers are published test numbers, and IBANs have valid check digits but random accounts. Passwords come from the system’s secure random number generator and, like records with a `password` field, are kept out of clipboard history (turn that off in the Workflow’s Configuration).
 
 ### Diff
 

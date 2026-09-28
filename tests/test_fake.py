@@ -507,6 +507,51 @@ class AuditOneTests(unittest.TestCase):
         self.assertEqual(fake("dice")[0]["uid"], "fake.dice")
 
 
+class IndependentAuditTests(unittest.TestCase):
+    """Independent audit (v1.2): one test per finding."""
+
+    def test_records_with_passwords_are_secrets(self):
+        for f in os.listdir(CACHE):
+            if f.startswith("fake-preview-"):
+                os.remove(os.path.join(CACHE, f))
+        it = fake("json 3 email,pw:password")
+        self.assertEqual([i["uid"] for i in it], ["fake.json", "fake.csv", "fake.sql", "fake.jsonl"])
+        for i in it:
+            self.assertEqual(i["variables"], {"fake_secret": "1"}, i["uid"])
+            self.assertEqual(i["mods"]["cmd"]["variables"], {"fake_secret": "1"})
+            self.assertNotIn("quicklookurl", i)
+            self.assertFalse(i["arg"].startswith("dtfile:"))
+        self.assertFalse([f for f in os.listdir(CACHE) if f.startswith("fake-preview-")])
+        big = fake("json 500 email,password")[0]
+        self.assertEqual(len(json.loads(big["arg"])), 100)
+        self.assertIn("up to 100 with passwords", big["subtitle"])
+        self.assertEqual(fake("json 2 email,pw:password", fake_transient="0")[0]["variables"], {"fake_secret": "2"})
+        # records without a password field are unchanged
+        self.assertEqual(fake("json 2 email")[0]["variables"], {"fake_secret": "0"})
+
+    def test_iban_uk(self):
+        self.assertTrue(fake("iban uk")[0]["arg"].startswith("GB"))
+        self.assertTrue(fake("iban gb")[0]["arg"].startswith("GB"))
+
+    def test_big_dice_are_explained(self):
+        for q in ("1000d1000", "d100000", "999d6"):
+            self.assertEqual(fake(q)[0]["title"], "Unsupported dice", q)
+
+    def test_generator_id_prefix_comes_first(self):
+        self.assertEqual(fake("ip")[0]["uid"], "fake.ipv4")  # not Lorem ipsum
+        self.assertEqual(fake("em")[0]["uid"], "fake.email")
+        self.assertEqual(fake("pass")[0]["uid"], "fake.password")
+
+    def test_small_ranges_stay_uniform_with_one_byte_draws(self):
+        for mode in ("", "urandom", "nsuuid"):
+            d = fake("digits 5000", DT_TEST_RANDOM=mode)[0]["arg"]
+            for k in "0123456789":
+                self.assertTrue(380 < d.count(k) < 620, (mode, k, d.count(k)))
+        t = time.time()
+        fake("digits 5000 1000")
+        self.assertLess(time.time() - t, 3.0)  # 5 million digits: one random byte each (was 4)
+
+
 class ResponseSizeTests(unittest.TestCase):
     def test_broad_filter_with_big_count_stays_small(self):
         out = subprocess.run(["osascript", "-l", "JavaScript", "./devtoolbox.js", "fake", "a 1000"], cwd=SRC,

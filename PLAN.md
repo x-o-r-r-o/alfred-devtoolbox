@@ -68,6 +68,7 @@ What they get wrong, from their READMEs, CHANGELOGs and issues (raycast/extensio
 - [x] Logic: card details matched a different card than the card row; ⌥↩ dropped the brand/country (`card amex`, `iban nl`); the Street and Postcode rows didn't match the Address row; `e-mail` found nothing and non-Latin words matched everything; `number 1-10` / `roll 2d6` weren't understood; `fake a 1000` produced a 745 KB response; two regexes held raw combining characters instead of escapes
 - [x] Conventions: passwords went through `resolve.sh` argv when the transient option was off; prototype keys (`__proto__`, `constructor`, `toString` as fields, filters and locales), bidi/control characters in titles, invalid UTF-8 in argv, curly apostrophes, keyword clashes, explicit mod args
 - [x] Alfred runtime: no LANG, bare PATH, fresh install (cache folder created on first Quick Look), workflow and cache folders with spaces, config values `1`/`0`/` 0 `/empty/padded locale/bogus locale; macOS 13: no JS syntax newer than Safari 16 (no `??`, `?.`, `replaceAll`, `.at()`, lookbehind), SecRandomCopyBytes bound through `ObjC.bindFunction` with /dev/urandom and NSUUID fallbacks
+- [x] Independent audit: records with a `password` field (`fake json 5 email,password`) went through `resolve.sh` argv, the cache and the Quick Look file: they are now secrets like the password rows (transient, never on disk, up to 100 records); `iban uk` gave a German IBAN; `fake ip` put Lorem ipsum above IPv4 (a generator whose id starts with the word now comes first); `1000d1000` said "No matching generator"; small ranges draw one random byte instead of four (`digits 5000 1000` 3.6 s → 1.1 s); an all-zero SecRandomCopyBytes buffer (bridge failure) falls back to /dev/urandom instead of producing "aaaa" passwords. Checked: Conditional wiring matches alfredapp/openai-workflow (else without `sourceoutputuid`); phone ranges re-checked against ACMA, Ofcom, Bundesnetzagentur, ARCEP and NANPA lists; Stripe test numbers; IBAN national check digits; Floyd sampling; dice edge cases (`0d6`, `d0`, `d1`, negative)
 
 ## Tech
 - **Stack:** JXA (`osascript -l JavaScript`) with the ObjC bridge: CommonCrypto (hashes, HMAC), zlib CRC32, NSPasteboard, NSTask. Bash for `resolve.sh`.
@@ -98,6 +99,7 @@ What they get wrong, from their READMEs, CHANGELOGs and issues (raycast/extensio
 
 ## Verify in real Alfred (v1.2, `fake`)
 - [ ] ↩ on a password row: the Conditional takes the "Password" branch; Alfred's Clipboard History (and e.g. Maccy) doesn't keep it; with the checkbox off it's kept.
+- [ ] `fake json 3 email,password`: ↩ also takes the "Password" branch (transient), and ⌘Y shows nothing.
 - [ ] ⌘↩ pastes through the transient paste object; normal rows still go through `resolve.sh` (JSON 1000 records pastes in full).
 - [ ] ⌥↩ closes Alfred and reopens it on `fake <generator> …` with the same row selected on top (no Automation prompt, since Alfred runs the script).
 - [ ] ⌘Y Quick Look on paragraphs / JSON rows shows the text file from the cache folder.
@@ -128,6 +130,9 @@ Sources: alfred.app/submit, alfred.app/submit/styleguide, alfred.app/submit/scre
 3. Date ranges (`fake date 2020-2024`) and custom formats.
 4. Pinned/favourite generators on top (Raycast pins), using the Alfred knowledge (`skipknowledge` off) for the list only.
 5. Custom SQL table name (`fake sql 5 name into customers`) and TSV/Markdown table output.
+6. ACMA's 30 reserved Australian mobile numbers (0491 570 006…) and 1800/1300 numbers, so `@au phone` can give a mobile.
+7. Documentation IPs (RFC 5737 192.0.2.0/24, 198.51.100.0/24, 203.0.113.0/24; RFC 3849 2001:db8::/32) as a "safe" IP row beside the public-range ones.
+8. `fake domain`/`url` on reserved names (`*.example`, `*.test`) as an option: today they use real TLDs, so a generated URL may exist.
 
 ## Ideas for v1.1
 Ranked by value for effort (Raycast issues for Format JSON, UUID Generator, JWT Decoder, Change Case, Diff Checker, Unix Timestamp; 2026-09).

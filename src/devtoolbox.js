@@ -170,7 +170,11 @@ function secureChunk(n) {
         secRandomBound = true;
       }
       const d = $.NSMutableData.dataWithLength(n);
-      if ($.SecRandomCopyBytes(null, n, d.mutableBytes) === 0) return latin1(d);
+      // an all-zero buffer means the bridge didn't hand SecRandomCopyBytes our memory: never use it
+      if ($.SecRandomCopyBytes(null, n, d.mutableBytes) === 0) {
+        const s = latin1(d);
+        if (/[^\0]/.test(s)) return s;
+      }
     } catch (e) {}
   }
   if (force !== "nsuuid") {
@@ -202,6 +206,13 @@ function rand32() {
 // Uniform integer in [0, n) without modulo bias (rejection sampling), for n up to 2^53
 function randInt(n) {
   if (!(n > 1)) return 0;
+  if (n <= 256) {
+    // one byte per draw for small ranges (digits, dice, letters, list picks): 4× less randomness to fetch
+    const lim = 256 - (256 % n);
+    let r;
+    do r = randByte(); while (r >= lim);
+    return r % n;
+  }
   if (n <= 0x100000000) {
     const lim = 0x100000000 - (0x100000000 % n);
     let r;
@@ -1447,6 +1458,7 @@ const FAKE_ALIASES = new Map([
 const FAKE_MAX = 1000; // values per row
 const FAKE_LIST_MAX = 100; // values per row when every generator is listed (keeps each keystroke fast)
 const FAKE_FIELDS_MAX = 40;
+const FAKE_SECRET_MAX = 100; // passwords (and records with a password field) per row: they stay in the response
 const EMAIL_DOMAINS = ["example.com", "example.net", "example.org"];
 const POSTCODE_LETTERS = "ABDEFGHJLNPQRSTUWXYZ";
 
@@ -1668,7 +1680,7 @@ function cardSpaced(n) {
 }
 
 // IBANs with valid check digits (ISO 13616) and, where a country has them, valid national check digits
-const IBAN_COUNTRIES = [["DE", "germany deutschland"], ["GB", "uk united kingdom britain"], ["FR", "france"], ["NL", "netherlands holland"], ["AT", "austria"], ["CH", "switzerland"], ["BE", "belgium"], ["ES", "spain"]];
+const IBAN_COUNTRIES = [["DE", "germany deutschland"], ["GB", "uk united kingdom britain great"], ["FR", "france"], ["NL", "netherlands holland"], ["AT", "austria"], ["CH", "switzerland"], ["BE", "belgium"], ["ES", "spain"]];
 function mod97(s) {
   let r = 0;
   for (const ch of s) r = (r * (ch >= "A" ? 100 : 10) + (ch >= "A" ? ch.charCodeAt(0) - 55 : Number(ch))) % 97;
@@ -1707,7 +1719,8 @@ function fakeIBAN(cc) {
   return `${cc}${pad2(98 - mod97(`${bban}${cc}00`))}${bban}`;
 }
 function ibanCountry(c) {
-  const hit = IBAN_COUNTRIES.find(([cc, names]) => c.words.some((w) => w === cc.toLowerCase() || (w.length >= 3 && names.split(" ").some((n) => n.startsWith(w)))));
+  // two-letter words must be a country code, or "uk"
+  const hit = IBAN_COUNTRIES.find(([cc, names]) => c.words.some((w) => w === cc.toLowerCase() || (cc === "GB" && w === "uk") || (w.length >= 3 && names.split(" ").some((n) => n.startsWith(w)))));
   return hit ? hit[0] : c.F.L.iban || "DE";
 }
 
@@ -1945,6 +1958,7 @@ function parseFields(tokens) {
     const key = i > 0 ? spec.slice(0, i) : spec;
     const kind = (i > 0 ? spec.slice(i + 1) : spec).toLowerCase().replace(/[\s_-]+/g, "");
     const fn = FAKE_FIELDS.get(kind);
+    if (kind === "password") out.secret = true;
     if (!fn) return { error: `Unknown field “${oneLine(i > 0 ? spec.slice(i + 1) : spec, 40)}”` };
     const at = out.findIndex(([k]) => k === key);
     if (at >= 0) out.splice(at, 1); // a repeated key keeps its last definition, like JSON
@@ -1981,10 +1995,13 @@ function structuredRows(F, kind, n, fieldTokens) {
     const names = "id, uuid, name, first, last, email, username, phone, company, job, street, city, state, postcode, country, address, lat, lng, ip, url, date, datetime, timestamp, age, bool, int, price, iban, card, sentence, paragraph…";
     return [info(fields.error, `Fields: ${names} · rename with key:field`, "error")];
   }
+  // records holding passwords are secrets like the password rows: transient, never on disk or in argv
+  const secret = !!fields.secret, capped = secret && n > FAKE_SECRET_MAX;
+  if (capped) n = FAKE_SECRET_MAX;
   const recs = makeRecords(F, fields, n);
   const single = n === 1;
   const data = single ? recs[0] : recs;
-  const what = `${plural(n, "record")} · ${fields.map(([k]) => k).join(", ")}`;
+  const what = `${plural(n, "record")}${capped ? ` (up to ${FAKE_SECRET_MAX} with passwords)` : ""} · ${fields.map(([k]) => k).join(", ")}`;
   const rows = {
     json: ["JSON", JSON.stringify(data, null, INDENT), `${single ? "JSON object" : "JSON array"} · ${what}`, JSON.stringify(data)],
     jsonl: ["JSON Lines", recs.map((r) => JSON.stringify(r)).join("\n"), `One object per line · ${what}`],
@@ -1994,13 +2011,13 @@ function structuredRows(F, kind, n, fieldTokens) {
   const order = [kind, ...["json", "csv", "sql", "jsonl"].filter((k) => k !== kind)];
   return order.map((k) => {
     const [label, value, sub, compact] = rows[k];
-    return { id: FAKE_GENS.find((g) => g.structured === k).id, label, value, sub, multiline: true, icon: "json", display: (compact || value).replace(/\s*\n\s*/g, " · ") };
+    return { id: FAKE_GENS.find((g) => g.structured === k).id, label, value, sub, secret, multiline: true, icon: "json", display: (compact || value).replace(/\s*\n\s*/g, " · ") };
   });
 }
 
 // "1-100", "1..100", "1 to 100", "-5-5", "0.5-2.5"; optional count after it
 const RANGE_RE = /^(-?\d+(?:\.\d+)?)\s*(?:-|–|\.\.|to)\s*(-?\d+(?:\.\d+)?)(?:\s+(\d+))?$/i;
-const DICE_RE = /^(\d{0,3})d(\d{1,4})(?:([+-])(\d{1,6}))?(?:\s+(\d+))?$/i;
+const DICE_RE = /^(\d{0,6})d(\d{1,6})(?:([+-])(\d{1,6}))?(?:\s+(\d+))?$/i;
 
 function rangeRows(m, xcount) {
   const [a, b] = [m[1], m[2]];
@@ -2168,6 +2185,10 @@ function fakeItems(query) {
   let gens = FAKE_GENS.filter((g) => (listAll ? !g.more : genMatches(g, words)));
   if (!gens.length)
     return [info("No matching generator", "Try name, email, address, password, lorem, json 5 name,email, 1-100, 3d6 or pick a, b, c", "fake")];
+  if (words.length === 1 && words[0].length >= 2) {
+    const head = gens.filter((g) => !g.more && g.id.startsWith(words[0]));
+    if (head.length) gens = [...head, ...gens.filter((g) => !head.includes(g))];
+  }
   const exactHit = gens.findIndex((g) => g.id === words.join("-") || g.id === words[0]);
   if (exactHit > 0) gens = [gens[exactHit], ...gens.filter((_, i) => i !== exactHit)];
   const maxCount = listAll ? FAKE_LIST_MAX : FAKE_MAX;
@@ -2182,7 +2203,7 @@ function fakeItems(query) {
       count = nums[1] !== undefined ? nums[1] : xcount || 1;
     } else count = nums[0] !== undefined ? nums[0] : xcount || 1;
     if (g.noCount) count = 1;
-    if (g.secret) count = Math.min(count, 100);
+    if (g.secret) count = Math.min(count, FAKE_SECRET_MAX);
     count = clamp(count, 1, maxCount);
     if (g.structured) {
       const n = listAll ? 3 : clamp(nums[0] || xcount || 3, 1, FAKE_MAX);
